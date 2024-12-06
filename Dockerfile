@@ -1,7 +1,20 @@
-FROM amazoncorretto:21.0.4-alpine3.18
+FROM openjdk:21-jdk AS build
 
-COPY target/inditex-0.0.1-SNAPSHOT.jar app.jar
+WORKDIR /app
+
+COPY mvnw* ./
+COPY pom.xml ./
+COPY .mvn .mvn
+COPY src ./src
+
+RUN ./mvnw clean package -DskipTests
+
+FROM openjdk:21-jdk
+
+WORKDIR /app
+
+COPY --from=build /app/target/inditex-0.0.1-SNAPSHOT.jar /app/inditex.jar
 
 EXPOSE 3000
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+ENTRYPOINT ["java", "-jar", "/app/inditex.jar"]
