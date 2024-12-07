@@ -1,3 +1,4 @@
+### Build the project
 FROM openjdk:21-jdk AS build
 
 WORKDIR /app
@@ -9,6 +10,7 @@ COPY src ./src
 
 RUN ./mvnw clean package -DskipTests
 
+### Run the application
 FROM openjdk:21-jdk
 
 WORKDIR /app
