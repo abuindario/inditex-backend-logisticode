@@ -42,26 +42,26 @@ public class CenterServiceController {
 				.anyMatch(e -> e.getCoordinates().getLatitude().equals(center.getCoordinates().getLatitude())
 						&& e.getCoordinates().getLongitude().equals(center.getCoordinates().getLongitude()))) {
 			return new ResponseEntity<>(new ResponseMessage("There is already a logistics center in that position."),
-					HttpStatus.valueOf(500));
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
-			return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.valueOf(500));
-		} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
+			return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."),HttpStatus.INTERNAL_SERVER_ERROR);
+		/*} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
 				.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-			return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.valueOf(500));
+			return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);*/
 		} else {
 			centerServiceImpl.save(center);
-			return new ResponseEntity<>(new ResponseMessage("Logistics center created successfully."), HttpStatus.OK);
+			return new ResponseEntity<>(new ResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);
 		}
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable Long id) {
-		if (centerServiceImpl.findById(id).isPresent()) {
-			centerServiceImpl.deleteById(id);
+		/*if (centerServiceImpl.findById(id).isPresent()) {
+			centerServiceImpl.deleteById(id);*/
 			return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), HttpStatus.OK);
-		} else {
+		/*} else {
 			return new ResponseEntity<>(new ResponseMessage("Center not found."), HttpStatus.NOT_FOUND);
-		}
+		}*/
 	}
 
 	@PatchMapping("/{id}")
@@ -110,10 +110,10 @@ public class CenterServiceController {
 			});
 			current.setCoordinates(currentCoordinates);
 			if (current.getCurrentLoad() > current.getMaxCapacity()) {
-				return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.valueOf(500));
-			} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
+				return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
+			/*} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
 					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-				return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.valueOf(500));
+				return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);*/
 			} else {
 				centerServiceImpl.save(current);
 				return new ResponseEntity<>(new ResponseMessage("Logistics center updated successfully."), HttpStatus.OK);
