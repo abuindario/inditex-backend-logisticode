@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hackathon.inditex.DTO.Mapper;
 import com.hackathon.inditex.DTO.OrderDTO;
-import com.hackathon.inditex.DTO.ResponseMessage;
+import com.hackathon.inditex.DTO.ResponseOrderMessage;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Services.OrderServiceImpl;
 
@@ -30,13 +30,12 @@ public class OrderServiceController {
 	}
 	
 	@PostMapping("/") 
-	public ResponseEntity<ResponseMessage> createNewOrder(@RequestBody OrderDTO orderDTO) {
+	public ResponseEntity<ResponseOrderMessage> createNewOrder(@RequestBody OrderDTO orderDTO) {
 		Order order = mapper.toOrder(orderDTO);
-		order.setStatus("PENDING");
 		if(order.getStatus().length() == 1 && ( (order.getStatus().toUpperCase().charAt(0) == 'B') || (order.getStatus().charAt(0) == 'M') 
 				|| (order.getStatus().charAt(0) == 'S' ))) {
 			orderServiceImpl.save(order);
-			return new ResponseEntity<>(new ResponseMessage("Order created successfully in PENDING status."), HttpStatus.CREATED);
+			return new ResponseEntity<>(mapper.toResponseOrderMessage(order), HttpStatus.CREATED);
 		} else {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}

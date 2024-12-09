@@ -35,5 +35,17 @@ public class Mapper {
 		order.setSize(orderDTO.getSize());
 		return order;
 	}
+	
+	public ResponseOrderMessage toResponseOrderMessage(Order order) {
+		ResponseOrderMessage rom = new ResponseOrderMessage();
+		rom.setOrderId(order.getId());
+		rom.setCustomerId(order.getCustomerId());
+		rom.setSize(order.getSize());
+		rom.setAssignedLogisticsCenter(order.getAssignedCenter());
+		rom.setCoordinates(order.getCoordinates());
+		rom.setStatus("PENDING");
+		rom.setMessage("Order created successfully in PENDING status.");
+		return rom;		
+	}
 
 }
