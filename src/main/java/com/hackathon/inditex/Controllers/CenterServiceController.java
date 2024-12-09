@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hackathon.inditex.DTO.CenterDTO;
 import com.hackathon.inditex.DTO.Mapper;
+import com.hackathon.inditex.DTO.ResponseMessage;
 import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Services.CenterServiceImpl;
@@ -35,36 +36,36 @@ public class CenterServiceController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<String> createNewLogisticsCenter(@RequestBody CenterDTO centerDTO) {
+	public ResponseEntity<ResponseMessage> createNewLogisticsCenter(@RequestBody CenterDTO centerDTO) {
 		Center center = mapper.toCenter(centerDTO);
 		if (readLogisticsCenters().getBody().stream()
 				.anyMatch(e -> e.getCoordinates().getLatitude().equals(center.getCoordinates().getLatitude())
 						&& e.getCoordinates().getLongitude().equals(center.getCoordinates().getLongitude()))) {
-			return new ResponseEntity<>("There is already a logistics center in that position.",
+			return new ResponseEntity<>(new ResponseMessage("There is already a logistics center in that position."),
 					HttpStatus.valueOf(500));
 		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
-			return new ResponseEntity<>("Current load cannot exceed max capacity.", HttpStatus.valueOf(500));
+			return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.valueOf(500));
 		} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
 				.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-			return new ResponseEntity<>("Invalid center capacity.", HttpStatus.valueOf(500));
+			return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.valueOf(500));
 		} else {
 			centerServiceImpl.save(center);
-			return new ResponseEntity<>("Logistics center created successfully.", HttpStatus.OK);
+			return new ResponseEntity<>(new ResponseMessage("Logistics center created successfully."), HttpStatus.OK);
 		}
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteLogisticsCenter(@PathVariable Long id) {
+	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable Long id) {
 		if (centerServiceImpl.findById(id).isPresent()) {
 			centerServiceImpl.deleteById(id);
-			return new ResponseEntity<>("Logistics center deleted successfully.", HttpStatus.OK);
+			return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), HttpStatus.OK);
 		} else {
-			return new ResponseEntity<>("Center not found.", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseMessage("Center not found."), HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@PatchMapping("/{id}")
-	public ResponseEntity<String> updateDetailsLogisticsCenter(@PathVariable Long id,
+	public ResponseEntity<ResponseMessage> updateDetailsLogisticsCenter(@PathVariable Long id,
 			@RequestBody Map<String, Object> updates) {
 		if (centerServiceImpl.findById(id).isPresent()) {
 			Center current = centerServiceImpl.findById(id).get();
@@ -109,16 +110,16 @@ public class CenterServiceController {
 			});
 			current.setCoordinates(currentCoordinates);
 			if (current.getCurrentLoad() > current.getMaxCapacity()) {
-				return new ResponseEntity<>("Current load cannot exceed max capacity.", HttpStatus.valueOf(500));
+				return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.valueOf(500));
 			} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
 					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-				return new ResponseEntity<>("Invalid center capacity.", HttpStatus.valueOf(500));
+				return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.valueOf(500));
 			} else {
 				centerServiceImpl.save(current);
-				return new ResponseEntity<>("Logistics center updated successfully.", HttpStatus.OK);
+				return new ResponseEntity<>(new ResponseMessage("Logistics center updated successfully."), HttpStatus.OK);
 			}
 		} else {
-			return new ResponseEntity<>("Center not found.", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseMessage("Center not found."), HttpStatus.NOT_FOUND);
 		}
 	}
 }
