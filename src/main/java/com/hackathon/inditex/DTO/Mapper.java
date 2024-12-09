@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Coordinates;
+import com.hackathon.inditex.Entities.Order;
 
 @Component
 public class Mapper {
@@ -24,6 +25,15 @@ public class Mapper {
 		coordinates.setLatitude(coordinatesDTO.getLatitude());
 		coordinates.setLongitude(coordinatesDTO.getLongitude());
 		return coordinates;
+	}
+	
+	public Order toOrder(OrderDTO orderDTO) {
+		Order order = new Order();
+		order.setAssignedCenter(orderDTO.getAssignedCenter());
+		order.setCoordinates(toCoordinates(orderDTO.getCoordinates()));
+		order.setCustomerId(orderDTO.getCustomerId());
+		order.setSize(orderDTO.getSize());
+		return order;
 	}
 
 }
