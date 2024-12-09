@@ -1,6 +1,7 @@
 package com.hackathon.inditex.Services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,25 @@ public class CenterServiceImpl implements CenterService {
 	}
 
 	@Override
-	public String createNewCenter(Center center) {
+	public String create (Center center) {
 		centerRepository.save(center);
 		return "Logistics center created successfully.";
+	}
+
+	@Override
+	public String deleteById (Long id) {
+		centerRepository.deleteById(id);
+		return "Logistics center deleted successfully.";
+	}
+	
+	@Override
+	public Optional<Center> findById(Long id) {
+		return centerRepository.findById(id);
+	}
+
+	@Override
+	public void updateCenter(Center center) {
+		centerRepository.save(center);
 	}
 
 }
