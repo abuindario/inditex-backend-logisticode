@@ -45,9 +45,9 @@ public class CenterServiceController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
 			return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."),HttpStatus.INTERNAL_SERVER_ERROR);
-		/*} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
+		} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
 				.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-			return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);*/
+			return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
 		} else {
 			centerServiceImpl.save(center);
 			return new ResponseEntity<>(new ResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);
@@ -111,9 +111,9 @@ public class CenterServiceController {
 			current.setCoordinates(currentCoordinates);
 			if (current.getCurrentLoad() > current.getMaxCapacity()) {
 				return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
-			/*} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
+			} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
 					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-				return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);*/
+				return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
 			} else {
 				centerServiceImpl.save(current);
 				return new ResponseEntity<>(new ResponseMessage("Logistics center updated successfully."), HttpStatus.OK);
