@@ -42,22 +42,23 @@ public class CenterServiceController {
 		} else if(center.getCurrentLoad() > center.getMaxCapacity()) {
 			message = "Current load cannot exceed max capacity.";
 		} else {
-			message = centerServiceImpl.create(center);
+			centerServiceImpl.save(center);
+			message = "Logistics center created successfully.";
 		}
-		
 		return message;
 	}
 	
 	@DeleteMapping("/{id}")
 	public String deleteLogisticsCenter(@PathVariable Long id) {
-		return centerServiceImpl.deleteById(id);
+		centerServiceImpl.deleteById(id);
+		return "Logistics center deleted successfully.";
 	}
 	
 	@PatchMapping("/{id}")
 	public String updateDetailsLogisticsCenter(@PathVariable Long id, @RequestBody CenterDTO centerDTO) {
 		String message = "undefined";
 		if(centerServiceImpl.findById(id).isPresent()) {
-			centerServiceImpl.updateCenter(mapper.toCenter(centerDTO));
+			centerServiceImpl.save(mapper.toCenter(centerDTO));
 			message = "Logistics center updated successfully.";
 		} else {
 			message = "Center not found.";

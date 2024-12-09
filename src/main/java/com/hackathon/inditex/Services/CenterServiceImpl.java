@@ -20,25 +20,18 @@ public class CenterServiceImpl implements CenterService {
 	}
 
 	@Override
-	public String create (Center center) {
+	public void save (Center center) {
 		centerRepository.save(center);
-		return "Logistics center created successfully.";
 	}
 
 	@Override
-	public String deleteById (Long id) {
+	public void deleteById (Long id) {
 		centerRepository.deleteById(id);
-		return "Logistics center deleted successfully.";
 	}
 	
 	@Override
 	public Optional<Center> findById(Long id) {
 		return centerRepository.findById(id);
-	}
-
-	@Override
-	public void updateCenter(Center center) {
-		centerRepository.save(center);
 	}
 
 }

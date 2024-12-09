@@ -9,11 +9,10 @@ public interface CenterService {
 
 	public List<Center> findAll();
 
-	public String create(Center center);
+	public void save(Center center);
 	
-	public String deleteById(Long id);
+	public void deleteById(Long id);
 	
 	public Optional<Center> findById(Long id);
-	
-	public void updateCenter(Center center);
+
 }
