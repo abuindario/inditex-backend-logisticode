@@ -25,4 +25,5 @@ public class Mapper {
 		coordinates.setLongitude(coordinatesDTO.getLongitude());
 		return coordinates;
 	}
+
 }

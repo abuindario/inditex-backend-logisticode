@@ -13,25 +13,25 @@ import com.hackathon.inditex.Repositories.CenterRepository;
 public class CenterServiceImpl implements CenterService {
 	@Autowired
 	CenterRepository centerRepository;
-	
+
 	@Override
 	public List<Center> findAll() {
 		return (List<Center>) centerRepository.findAll();
 	}
 
 	@Override
-	public void save (Center center) {
+	public Optional<Center> findById(Long id) {
+		return centerRepository.findById(id);
+	}
+
+	@Override
+	public void save(Center center) {
 		centerRepository.save(center);
 	}
 
 	@Override
-	public void deleteById (Long id) {
+	public void deleteById(Long id) {
 		centerRepository.deleteById(id);
-	}
-	
-	@Override
-	public Optional<Center> findById(Long id) {
-		return centerRepository.findById(id);
 	}
 
 }
