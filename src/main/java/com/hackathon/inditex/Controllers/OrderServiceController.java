@@ -24,10 +24,10 @@ public class OrderServiceController {
 	
 	public Mapper mapper = new Mapper();
 
-	@GetMapping("")
-	public ResponseEntity<List<Order>> readOrders() {
-		return new ResponseEntity<>(orderServiceImpl.findAll(), HttpStatus.OK);
-	}
+//	@GetMapping("")
+//	public ResponseEntity<List<Order>> readOrders() {
+//		return new ResponseEntity<>(orderServiceImpl.findAll(), HttpStatus.OK);
+//	}
 	
 	@PostMapping("") 
 	public ResponseEntity<?> createNewOrder(@RequestBody OrderDTO orderDTO) {
