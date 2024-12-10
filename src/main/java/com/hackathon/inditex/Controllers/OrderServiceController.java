@@ -24,21 +24,21 @@ public class OrderServiceController {
 	
 	public Mapper mapper = new Mapper();
 
-//	@GetMapping("")
-//	public ResponseEntity<List<Order>> readOrders() {
-//		return new ResponseEntity<>(orderServiceImpl.findAll(), HttpStatus.OK);
-//	}
-	
-	@PostMapping("") 
-	public ResponseEntity<?> createNewOrder(@RequestBody OrderDTO orderDTO) {
-		Order order = mapper.toOrder(orderDTO);
-		if(order.getSize().length() == 1 && ( (order.getSize().toUpperCase().charAt(0) == 'B') || (order.getSize().charAt(0) == 'M') 
-				|| (order.getSize().charAt(0) == 'S' ))) {
-			order.setStatus("PENDING");
-			orderServiceImpl.save(order);
-			return new ResponseEntity<>(mapper.toResponseOrderMessage(order), HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<>(new ResponseMessage("Cannot create order."), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	@GetMapping("")
+	public ResponseEntity<List<Order>> readOrders() {
+		return new ResponseEntity<>(orderServiceImpl.findAll(), HttpStatus.OK);
 	}
+	
+//	@PostMapping("") 
+//	public ResponseEntity<?> createNewOrder(@RequestBody OrderDTO orderDTO) {
+//		Order order = mapper.toOrder(orderDTO);
+//		if(order.getSize().length() == 1 && ( (order.getSize().toUpperCase().charAt(0) == 'B') || (order.getSize().charAt(0) == 'M') 
+//				|| (order.getSize().charAt(0) == 'S' ))) {
+//			order.setStatus("PENDING");
+//			orderServiceImpl.save(order);
+//			return new ResponseEntity<>(mapper.toResponseOrderMessage(order), HttpStatus.CREATED);
+//		} else {
+//			return new ResponseEntity<>(new ResponseMessage("Cannot create order."), HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//	}
 }
