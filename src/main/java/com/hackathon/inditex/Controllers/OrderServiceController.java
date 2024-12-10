@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hackathon.inditex.DTO.Mapper;
 import com.hackathon.inditex.DTO.OrderDTO;
-import com.hackathon.inditex.DTO.ResponseOrderMessage;
+import com.hackathon.inditex.DTO.ResponseMessage;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Services.OrderServiceImpl;
 
@@ -30,7 +30,7 @@ public class OrderServiceController {
 	}
 	
 	@PostMapping("/") 
-	public ResponseEntity<ResponseOrderMessage> createNewOrder(@RequestBody OrderDTO orderDTO) {
+	public ResponseEntity<?> createNewOrder(@RequestBody OrderDTO orderDTO) {
 		Order order = mapper.toOrder(orderDTO);
 		if(order.getSize().length() == 1 && ( (order.getSize().toUpperCase().charAt(0) == 'B') || (order.getSize().charAt(0) == 'M') 
 				|| (order.getSize().charAt(0) == 'S' ))) {
@@ -38,7 +38,7 @@ public class OrderServiceController {
 			orderServiceImpl.save(order);
 			return new ResponseEntity<>(mapper.toResponseOrderMessage(order), HttpStatus.CREATED);
 		} else {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new ResponseMessage("Cannot create order."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }
