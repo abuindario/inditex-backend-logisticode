@@ -32,8 +32,8 @@ public class OrderServiceController {
 	@PostMapping("/") 
 	public ResponseEntity<ResponseOrderMessage> createNewOrder(@RequestBody OrderDTO orderDTO) {
 		Order order = mapper.toOrder(orderDTO);
-		if(order.getStatus().length() == 1 && ( (order.getStatus().toUpperCase().charAt(0) == 'B') || (order.getStatus().charAt(0) == 'M') 
-				|| (order.getStatus().charAt(0) == 'S' ))) {
+		if(order.getSize().length() == 1 && ( (order.getSize().toUpperCase().charAt(0) == 'B') || (order.getSize().charAt(0) == 'M') 
+				|| (order.getSize().charAt(0) == 'S' ))) {
 			orderServiceImpl.save(order);
 			return new ResponseEntity<>(mapper.toResponseOrderMessage(order), HttpStatus.CREATED);
 		} else {
