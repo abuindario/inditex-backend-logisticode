@@ -15,5 +15,4 @@ public interface CenterService {
 	
 	public Optional<Center> findById(Long id);
 
-	public void delete(Center center);
 }

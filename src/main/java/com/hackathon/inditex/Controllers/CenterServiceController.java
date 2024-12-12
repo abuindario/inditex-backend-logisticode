@@ -2,11 +2,9 @@ package com.hackathon.inditex.Controllers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,24 +82,14 @@ public class CenterServiceController {
 
 	// 0 points
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteLogisticsCenter(@PathVariable Optional<Long> id) {
-		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-		Optional<Center> toDelete = null;
-		String message = "";
-		if(id.isPresent()) {
-			toDelete = centerServiceImpl.findById(id.get());
-		} 
-		if(toDelete.isPresent()) {
-			centerServiceImpl.delete(toDelete.get());
-			status = HttpStatus.OK;
-			message = "Logistics center deleted successfully.";
-		}
-		return new ResponseEntity<>(new ResponseMessage(message), status);
+	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable("id") Long id) {
+		centerServiceImpl.deleteById(id);
+		return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), HttpStatus.OK);
 	}
 
 	// 57 points
 	@PatchMapping("/{id}")
-	public ResponseEntity<ResponseMessage> updateDetailsLogisticsCenter(@PathVariable Long id,
+	public ResponseEntity<ResponseMessage> updateDetailsLogisticsCenter(@PathVariable("id") Long id,
 			@RequestBody Map<String, Object> updates) {
 		if (centerServiceImpl.findById(id).isPresent()) {
 			Center current = centerServiceImpl.findById(id).get();
