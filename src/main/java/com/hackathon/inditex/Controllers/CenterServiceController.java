@@ -2,6 +2,7 @@ package com.hackathon.inditex.Controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -58,10 +59,13 @@ public class CenterServiceController {
 
 	// 0 points
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable Long id) {
-		centerServiceImpl.deleteById(id);
-		return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), HttpStatus.OK);
-
+	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable Optional<Long> id) {
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		if(id.isPresent()) {
+			centerServiceImpl.deleteById(id.get());
+			status = HttpStatus.OK;
+		} 
+		return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), status);
 	}
 
 	// 57 points
