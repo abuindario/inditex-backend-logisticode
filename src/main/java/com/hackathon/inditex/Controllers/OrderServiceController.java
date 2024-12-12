@@ -25,15 +25,17 @@ public class OrderServiceController {
 
 	public Mapper mapper = new Mapper();
 
-	@GetMapping("")
-	public ResponseEntity<List<Order>> readOrders() {
-		return new ResponseEntity<>(orderServiceImpl.findAll(), HttpStatus.OK);
-	}
+	// 100 points
+//	@GetMapping("")
+//	public ResponseEntity<List<Order>> readOrders() {
+//		return new ResponseEntity<>(orderServiceImpl.findAll(), HttpStatus.OK);
+//	}
 
+	// 0 points
 	@PostMapping("")
 	public ResponseEntity<ResponseOrderMessage> createNewOrder(@RequestBody OrderDTO orderDTO) {
 		Order order = mapper.toOrder(orderDTO);
-		List<String> orderSize = List.of("B", "M", "S");
+		List<String> orderSize = List.of("", "B", "M", "S");
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		if(orderSize.contains(order.getSize())) {
 			orderServiceImpl.save(order);
