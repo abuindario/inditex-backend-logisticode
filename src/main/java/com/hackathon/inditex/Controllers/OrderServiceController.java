@@ -26,10 +26,10 @@ public class OrderServiceController {
 	public Mapper mapper = new Mapper();
 
 	// 100 points
-//	@GetMapping("")
-//	public ResponseEntity<List<Order>> readOrders() {
-//		return new ResponseEntity<>(orderServiceImpl.findAll(), HttpStatus.OK);
-//	}
+	@GetMapping("")
+	public ResponseEntity<List<Order>> readOrders() {
+		return new ResponseEntity<>(orderServiceImpl.findAll(), HttpStatus.OK);
+	}
 
 	// 0 points
 	@PostMapping("")
