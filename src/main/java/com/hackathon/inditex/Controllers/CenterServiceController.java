@@ -60,7 +60,7 @@ public class CenterServiceController {
 	@PostMapping("")
 	public ResponseEntity<ResponseMessage> createNewLogisticsCenter(@RequestBody CenterDTO centerDTO) {
 		Center center = mapper.toCenter(centerDTO);
-		HttpStatus status = HttpStatus.BAD_REQUEST;
+		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 		String message = "";
 		ResponseMessage rm = new ResponseMessage(message);
 		List<String> centerCapacity = List.of("B", "M", "S");

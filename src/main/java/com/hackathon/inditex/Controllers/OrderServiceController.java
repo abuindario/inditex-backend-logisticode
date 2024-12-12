@@ -36,7 +36,7 @@ public class OrderServiceController {
 	public ResponseEntity<ResponseOrderMessage> createNewOrder(@RequestBody OrderDTO orderDTO) {
 		Order order = mapper.toOrder(orderDTO);
 		List<String> orderSize = List.of("B", "M", "S");
-		HttpStatus status = HttpStatus.BAD_REQUEST;
+		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 		if(orderSize.contains(order.getSize()) && order.getCustomerId() != null && (order.getCoordinates().getLatitude() != null && order.getCoordinates().getLongitude() != null)) {
 			orderServiceImpl.save(order);
 			status = HttpStatus.CREATED;
