@@ -56,72 +56,73 @@ public class CenterServiceController {
 //		}
 //	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable Long id) {
-		/*if (centerServiceImpl.findById(id).isPresent()) {
-			centerServiceImpl.deleteById(id);*/
-			return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), HttpStatus.OK);
-		/*} else {
-			return new ResponseEntity<>(new ResponseMessage("Center not found."), HttpStatus.NOT_FOUND);
-		}*/
-	}
-
-//	@PatchMapping("/{id}")
-//	public ResponseEntity<ResponseMessage> updateDetailsLogisticsCenter(@PathVariable Long id,
-//			@RequestBody Map<String, Object> updates) {
-//		if (centerServiceImpl.findById(id).isPresent()) {
-//			Center current = centerServiceImpl.findById(id).get();
-//			Coordinates currentCoordinates = current.getCoordinates();
-//			updates.entrySet().forEach(entry -> {
-//				if (entry.getValue() != null) {
-//					Object newValue = entry.getValue();
-//					switch (entry.getKey()) {
-//					case "name":
-//						current.setName(newValue.toString());
-//						break;
-//					case "capacity":
-//						current.setCapacity(newValue.toString());
-//						break;
-//					case "status":
-//						current.setStatus(newValue.toString());
-//						break;
-//					case "maxCapacity":
-//						current.setMaxCapacity(Integer.valueOf(newValue.toString()));
-//						break;
-//					case "currentLoad":
-//						current.setCurrentLoad(Integer.valueOf(newValue.toString()));
-//						break;
-//					case "longitude":
-//						currentCoordinates.setLongitude(Double.valueOf(newValue.toString()));
-//						break;
-//					case "latitude":
-//						currentCoordinates.setLatitude(Double.valueOf(newValue.toString()));
-//						break;
-//					case "coordinates":
-//						Map<String, Double> upd = (Map<String, Double>) newValue;
-//						upd.entrySet().forEach(coor -> {
-//							if(coor.getKey().toString().equals("longitude")) {
-//								currentCoordinates.setLongitude(coor.getValue());
-//							} else if(coor.getKey().toString().equals("latitude") ) {
-//								currentCoordinates.setLatitude(coor.getValue());
-//							}
-//						} );
-//						break;
-//					}
-//				}
-//			});
-//			current.setCoordinates(currentCoordinates);
-//			if (current.getCurrentLoad() > current.getMaxCapacity()) {
-//				return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
-//			} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
-//					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-//				return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
-//			} else {
-//				centerServiceImpl.save(current);
-//				return new ResponseEntity<>(new ResponseMessage("Logistics center updated successfully."), HttpStatus.OK);
-//			}
-//		} else {
+	// 0 points
+//	@DeleteMapping("/{id}")
+//	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable Long id) {
+//		/*if (centerServiceImpl.findById(id).isPresent()) {
+//			centerServiceImpl.deleteById(id);*/
+//			return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), HttpStatus.OK);
+//		/*} else {
 //			return new ResponseEntity<>(new ResponseMessage("Center not found."), HttpStatus.NOT_FOUND);
-//		}
+//		}*/
 //	}
+
+	@PatchMapping("/{id}")
+	public ResponseEntity<ResponseMessage> updateDetailsLogisticsCenter(@PathVariable Long id,
+			@RequestBody Map<String, Object> updates) {
+		if (centerServiceImpl.findById(id).isPresent()) {
+			Center current = centerServiceImpl.findById(id).get();
+			Coordinates currentCoordinates = current.getCoordinates();
+			updates.entrySet().forEach(entry -> {
+				if (entry.getValue() != null) {
+					Object newValue = entry.getValue();
+					switch (entry.getKey()) {
+					case "name":
+						current.setName(newValue.toString());
+						break;
+					case "capacity":
+						current.setCapacity(newValue.toString());
+						break;
+					case "status":
+						current.setStatus(newValue.toString());
+						break;
+					case "maxCapacity":
+						current.setMaxCapacity(Integer.valueOf(newValue.toString()));
+						break;
+					case "currentLoad":
+						current.setCurrentLoad(Integer.valueOf(newValue.toString()));
+						break;
+					case "longitude":
+						currentCoordinates.setLongitude(Double.valueOf(newValue.toString()));
+						break;
+					case "latitude":
+						currentCoordinates.setLatitude(Double.valueOf(newValue.toString()));
+						break;
+					case "coordinates":
+						Map<String, Double> upd = (Map<String, Double>) newValue;
+						upd.entrySet().forEach(coor -> {
+							if(coor.getKey().toString().equals("longitude")) {
+								currentCoordinates.setLongitude(coor.getValue());
+							} else if(coor.getKey().toString().equals("latitude") ) {
+								currentCoordinates.setLatitude(coor.getValue());
+							}
+						} );
+						break;
+					}
+				}
+			});
+			current.setCoordinates(currentCoordinates);
+			if (current.getCurrentLoad() > current.getMaxCapacity()) {
+				return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
+			} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
+					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
+				return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
+			} else {
+				centerServiceImpl.save(current);
+				return new ResponseEntity<>(new ResponseMessage("Logistics center updated successfully."), HttpStatus.OK);
+			}
+		} else {
+			return new ResponseEntity<>(new ResponseMessage("Center not found."), HttpStatus.NOT_FOUND);
+		}
+	}
 }
