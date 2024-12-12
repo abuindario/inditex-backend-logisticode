@@ -34,4 +34,9 @@ public class CenterServiceImpl implements CenterService {
 		centerRepository.deleteById(id);
 	}
 
+	@Override
+	public void delete(Center center) {
+		centerRepository.delete(center);
+	}
+
 }
