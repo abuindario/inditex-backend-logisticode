@@ -82,8 +82,8 @@ public class CenterServiceController {
 
 	// 0 points
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable("id") Long id) {
-		centerServiceImpl.deleteById(id);
+	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable("id") int id) {
+		centerServiceImpl.deleteById((long)id);
 		return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), HttpStatus.OK);
 	}
 
