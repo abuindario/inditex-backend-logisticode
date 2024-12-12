@@ -33,14 +33,13 @@ public class OrderServiceController {
 	@PostMapping("")
 	public ResponseEntity<ResponseOrderMessage> createNewOrder(@RequestBody OrderDTO orderDTO) {
 		Order order = mapper.toOrder(orderDTO);
-		if (order.getSize().length() <= 1
-				&& (order.getSize().length() == 0 || ((order.getSize().toUpperCase().charAt(0) == 'B')
-						|| (order.getSize().charAt(0) == 'M') || (order.getSize().charAt(0) == 'S')))) {
-			order.setStatus("PENDING");
+		List<String> orderSize = List.of("B", "M", "S");
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		if(orderSize.contains(order.getSize())) {
 			orderServiceImpl.save(order);
-			return new ResponseEntity<>(mapper.toResponseOrderMessage(order), HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<>(mapper.toResponseOrderMessage(order), HttpStatus.INTERNAL_SERVER_ERROR);
+			status = HttpStatus.CREATED;
 		}
+		return new ResponseEntity<>(mapper.toResponseOrderMessage(order), status);
+
 	}
 }

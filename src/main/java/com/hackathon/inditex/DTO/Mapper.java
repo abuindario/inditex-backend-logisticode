@@ -33,6 +33,7 @@ public class Mapper {
 		order.setCoordinates(toCoordinates(orderDTO.getCoordinates()));
 		order.setCustomerId(orderDTO.getCustomerId());
 		order.setSize(orderDTO.getSize());
+		order.setStatus("PENDING");
 		return order;
 	}
 	
@@ -44,7 +45,7 @@ public class Mapper {
 		rom.setAssignedLogisticsCenter(order.getAssignedCenter());
 		rom.setCoordinates(order.getCoordinates());
 		rom.setStatus(order.getStatus());
-		rom.setMessage("Order created successfully in PENDING status.");
+		rom.setMessage("Order created successfully in " + order.getStatus() +" status.");
 		return rom;		
 	}
 
