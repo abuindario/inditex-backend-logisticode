@@ -39,23 +39,46 @@ public class CenterServiceController {
 	}
 
 	// 57 points
+//	@PostMapping("")
+//	public ResponseEntity<ResponseMessage> createNewLogisticsCenter(@RequestBody CenterDTO centerDTO) {
+//		Center center = mapper.toCenter(centerDTO);
+//		if (readLogisticsCenters().getBody().stream()
+//				.anyMatch(e -> e.getCoordinates().getLatitude().equals(center.getCoordinates().getLatitude())
+//						&& e.getCoordinates().getLongitude().equals(center.getCoordinates().getLongitude()))) {
+//			return new ResponseEntity<>(new ResponseMessage("There is already a logistics center in that position."),
+//					HttpStatus.INTERNAL_SERVER_ERROR);
+//		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
+//			return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."),HttpStatus.INTERNAL_SERVER_ERROR);
+//		} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
+//				.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
+//			return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
+//		} else {
+//			centerServiceImpl.save(center);
+//			return new ResponseEntity<>(new ResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);
+//		}
+//	}
 	@PostMapping("")
 	public ResponseEntity<ResponseMessage> createNewLogisticsCenter(@RequestBody CenterDTO centerDTO) {
 		Center center = mapper.toCenter(centerDTO);
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		String message = "";
+		ResponseMessage rm = new ResponseMessage(message);
+		List<String> centerCapacity = List.of("B", "M", "S");
 		if (readLogisticsCenters().getBody().stream()
 				.anyMatch(e -> e.getCoordinates().getLatitude().equals(center.getCoordinates().getLatitude())
 						&& e.getCoordinates().getLongitude().equals(center.getCoordinates().getLongitude()))) {
-			return new ResponseEntity<>(new ResponseMessage("There is already a logistics center in that position."),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			message = "There is already a logistics center in that position.";
 		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
-			return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."),HttpStatus.INTERNAL_SERVER_ERROR);
-		} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
-				.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-			return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
+			message = "Current load cannot exceed max capacity.";
+		} else if(!centerCapacity.contains(center.getCapacity().toString())) {			
+			message = "Invalid center capacity.";
 		} else {
 			centerServiceImpl.save(center);
-			return new ResponseEntity<>(new ResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);
+			status = HttpStatus.CREATED;
+			message = "Logistics center created successfully.";
 		}
+		return new ResponseEntity<>(rm, status);
+
 	}
 
 	// 0 points
