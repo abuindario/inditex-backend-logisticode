@@ -59,9 +59,15 @@ public class CenterServiceController {
 
 	// 0 points
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Object> deleteLogisticsCenter(@PathVariable("id") Long id) {
-		centerServiceImpl.deleteById(id);
-		return ResponseHandler.generateResponse("Logistics center deleted successfully.", HttpStatus.OK);
+	public ResponseEntity<Object> deleteLogisticsCenter(@PathVariable("id") int id) {
+		String message = "Couldn't find a center with the provided ID.";
+		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+		if(centerServiceImpl.findById((long)id).isPresent()) {
+			centerServiceImpl.deleteById((long) id);
+			message = "Logistics center deleted successfully.";
+			status = HttpStatus.OK;
+		}
+		return ResponseHandler.generateResponse(message, status);
 	}
 
 	// 57 points
