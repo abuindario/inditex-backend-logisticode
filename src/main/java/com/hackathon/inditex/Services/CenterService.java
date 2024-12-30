@@ -14,4 +14,8 @@ public interface CenterService {
 	public void deleteById(Long id);
 	
 	public Optional<Center> findById(Long id);
+	
+	public boolean existsById(Long id);
 }
+
+

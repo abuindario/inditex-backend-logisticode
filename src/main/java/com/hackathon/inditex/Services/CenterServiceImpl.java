@@ -34,6 +34,9 @@ public class CenterServiceImpl implements CenterService {
 		centerRepository.deleteById(id);
 	}
 	
-	
+	@Override
+	public boolean existsById(Long id) {
+		return centerRepository.existsById(id);
+	}
 
 }
