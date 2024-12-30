@@ -2,6 +2,7 @@ package com.hackathon.inditex.Controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -59,15 +60,19 @@ public class CenterServiceController {
 
 	// 0 points
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Object> deleteLogisticsCenter(@PathVariable("id") int id) {
-		String message = "Couldn't find a center with the provided ID.";
-		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-		if(centerServiceImpl.findById((long)id).isPresent()) {
-			centerServiceImpl.deleteById((long) id);
-			message = "Logistics center deleted successfully.";
-			status = HttpStatus.OK;
-		}
-		return ResponseHandler.generateResponse(message, status);
+	public ResponseEntity<Object> deleteLogisticsCenter(@PathVariable("id") Long id) {
+	    String message;
+	    HttpStatus status;
+	    Optional<Center> centerOptional = centerServiceImpl.findById(id);
+	    if (centerOptional.isPresent()) {
+	        centerServiceImpl.deleteById(id);
+	        message = "Logistics center deleted successfully.";
+	        status = HttpStatus.OK;
+	    } else {
+	        message = "Couldn't find a center with the provided ID.";
+	        status = HttpStatus.NOT_FOUND;
+	    }
+	    return ResponseHandler.generateResponse(message, status);
 	}
 
 	// 57 points
