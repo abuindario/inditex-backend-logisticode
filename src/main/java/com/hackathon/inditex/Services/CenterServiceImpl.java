@@ -33,5 +33,7 @@ public class CenterServiceImpl implements CenterService {
 	public void deleteById(Long id) {
 		centerRepository.deleteById(id);
 	}
+	
+	
 
 }

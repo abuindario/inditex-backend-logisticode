@@ -59,21 +59,21 @@ public class CenterServiceController {
 	}
 
 	// 0 points
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Object> deleteLogisticsCenter(@PathVariable("id") Long id) {
-	    String message;
-	    HttpStatus status;
-	    Optional<Center> centerOptional = centerServiceImpl.findById(id);
-	    if (centerOptional.isPresent()) {
-	        centerServiceImpl.deleteById(id);
-	        message = "Logistics center deleted successfully.";
-	        status = HttpStatus.OK;
-	    } else {
-	        message = "Couldn't find a center with the provided ID.";
-	        status = HttpStatus.NOT_FOUND;
-	    }
-	    return ResponseHandler.generateResponse(message, status);
-	}
+//	@DeleteMapping("/{id}")
+//	public ResponseEntity<Object> deleteLogisticsCenter(@PathVariable("id") Long id) {
+//	    String message;
+//	    HttpStatus status;
+//	    Optional<Center> centerOptional = centerServiceImpl.findById(id);
+//	    if (centerOptional.isPresent()) {
+//	        centerServiceImpl.deleteById(id);
+//	        message = "Logistics center deleted successfully.";
+//	        status = HttpStatus.OK;
+//	    } else {
+//	        message = "Couldn't find a center with the provided ID.";
+//	        status = HttpStatus.NOT_FOUND;
+//	    }
+//	    return ResponseHandler.generateResponse(message, status);
+//	}
 
 	// 57 points
 	@PatchMapping("/{id}")
