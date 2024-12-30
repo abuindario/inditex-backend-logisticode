@@ -36,17 +36,5 @@ public class Mapper {
 		order.setStatus("PENDING");
 		return order;
 	}
-	
-	public ResponseOrderMessage toResponseOrderMessage(Order order) {
-		ResponseOrderMessage rom = new ResponseOrderMessage();
-		rom.setOrderId(order.getId());
-		rom.setCustomerId(order.getCustomerId());
-		rom.setSize(order.getSize());
-		rom.setAssignedLogisticsCenter(order.getAssignedCenter());
-		rom.setCoordinates(order.getCoordinates());
-		rom.setStatus(order.getStatus());
-		rom.setMessage("Order created successfully in " + order.getStatus() +" status.");
-		return rom;		
-	}
 
 }

@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hackathon.inditex.DTO.CenterDTO;
 import com.hackathon.inditex.DTO.Mapper;
-import com.hackathon.inditex.DTO.ResponseMessage;
 import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Services.CenterServiceImpl;
+import com.hackathon.inditex.handler.ResponseHandler;
 
 @RestController
 @RequestMapping("/api/centers")
@@ -33,63 +33,40 @@ public class CenterServiceController {
 	// 57 points
 	@GetMapping("")
 	public ResponseEntity<List<Center>> readLogisticsCenters() {
-		return new ResponseEntity<>(centerServiceImpl.findAll(), HttpStatus.OK);
+		return new ResponseEntity<List<Center>>(centerServiceImpl.findAll(), HttpStatus.OK);
 	}
 
 	// 57 points
 	@PostMapping("")
-	public ResponseEntity<ResponseMessage> createNewLogisticsCenter(@RequestBody CenterDTO centerDTO) {
+	public ResponseEntity<Object> createNewLogisticsCenter(@RequestBody CenterDTO centerDTO) {
 		Center center = mapper.toCenter(centerDTO);
 		if (readLogisticsCenters().getBody().stream()
 				.anyMatch(e -> e.getCoordinates().getLatitude().equals(center.getCoordinates().getLatitude())
 						&& e.getCoordinates().getLongitude().equals(center.getCoordinates().getLongitude()))) {
-			return new ResponseEntity<>(new ResponseMessage("There is already a logistics center in that position."),
+			return ResponseHandler.generateResponse("There is already a logistics center in that position.",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
-			return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."),HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseHandler.generateResponse("Current load cannot exceed max capacity.",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
 				.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-			return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
 		} else {
 			centerServiceImpl.save(center);
-			return new ResponseEntity<>(new ResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);
+			return ResponseHandler.generateResponse("Logistics center created successfully.", HttpStatus.CREATED);
 		}
 	}
-	
-	// 0 points
-//	@PostMapping("")
-//	public ResponseEntity<ResponseMessage> createNewLogisticsCenter(@RequestBody CenterDTO centerDTO) {
-//		Center center = mapper.toCenter(centerDTO);
-//		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-//		String message = "";
-//		ResponseMessage rm = new ResponseMessage(message);
-//		List<String> centerCapacity = List.of("B", "M", "S");
-//		if (readLogisticsCenters().getBody().stream()
-//				.anyMatch(e -> e.getCoordinates().getLatitude().equals(center.getCoordinates().getLatitude())
-//						&& e.getCoordinates().getLongitude().equals(center.getCoordinates().getLongitude()))) {
-//			message = "There is already a logistics center in that position.";
-//		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
-//			message = "Current load cannot exceed max capacity.";
-//		} else if(!centerCapacity.contains(center.getCapacity().toString())) {			
-//			message = "Invalid center capacity.";
-//		} else {
-//			centerServiceImpl.save(center);
-//			status = HttpStatus.CREATED;
-//			message = "Logistics center created successfully.";
-//		}
-//		return new ResponseEntity<>(rm, status);
-//	}
 
 	// 0 points
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ResponseMessage> deleteLogisticsCenter(@PathVariable("id") Long id) {
-		centerServiceImpl.deleteById(centerServiceImpl.findById(id).get().getId());
-		return new ResponseEntity<>(new ResponseMessage("Logistics center deleted successfully."), HttpStatus.OK);
+	public ResponseEntity<Object> deleteLogisticsCenter(@PathVariable("id") Long id) {
+		centerServiceImpl.deleteById(id);
+		return ResponseHandler.generateResponse("Logistics center deleted successfully.", HttpStatus.OK);
 	}
 
 	// 57 points
 	@PatchMapping("/{id}")
-	public ResponseEntity<ResponseMessage> updateDetailsLogisticsCenter(@PathVariable("id") Long id,
+	public ResponseEntity<Object> updateDetailsLogisticsCenter(@PathVariable("id") Long id,
 			@RequestBody Map<String, Object> updates) {
 		if (centerServiceImpl.findById(id).isPresent()) {
 			Center current = centerServiceImpl.findById(id).get();
@@ -122,28 +99,29 @@ public class CenterServiceController {
 					case "coordinates":
 						Map<String, Double> upd = (Map<String, Double>) newValue;
 						upd.entrySet().forEach(coor -> {
-							if(coor.getKey().toString().equals("longitude")) {
+							if (coor.getKey().toString().equals("longitude")) {
 								currentCoordinates.setLongitude(coor.getValue());
-							} else if(coor.getKey().toString().equals("latitude") ) {
+							} else if (coor.getKey().toString().equals("latitude")) {
 								currentCoordinates.setLatitude(coor.getValue());
 							}
-						} );
+						});
 						break;
 					}
 				}
 			});
 			current.setCoordinates(currentCoordinates);
 			if (current.getCurrentLoad() > current.getMaxCapacity()) {
-				return new ResponseEntity<>(new ResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
+				return ResponseHandler.generateResponse("Current load cannot exceed max capacity.",
+						HttpStatus.INTERNAL_SERVER_ERROR);
 			} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
 					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-				return new ResponseEntity<>(new ResponseMessage("Invalid center capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
+				return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
 			} else {
 				centerServiceImpl.save(current);
-				return new ResponseEntity<>(new ResponseMessage("Logistics center updated successfully."), HttpStatus.OK);
+				return ResponseHandler.generateResponse("Logistics center updated successfully.", HttpStatus.OK);
 			}
 		} else {
-			return new ResponseEntity<>(new ResponseMessage("Center not found."), HttpStatus.NOT_FOUND);
+			return ResponseHandler.generateResponse("Center not found.", HttpStatus.NOT_FOUND);
 		}
 	}
 }

@@ -21,6 +21,11 @@ public class OrderServiceImpl implements OrderService{
 	public void save(Order order) {
 		orderRepository.save(order);
 	}
+
+	@Override
+	public void remove(Order order) {
+		orderRepository.delete(order);
+	}
 	
 	
 }

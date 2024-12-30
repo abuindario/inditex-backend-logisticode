@@ -9,4 +9,6 @@ public interface OrderService {
 	public List<Order> findAll();
 	
 	public void save(Order order);
+	
+	public void remove(Order order);
 }
