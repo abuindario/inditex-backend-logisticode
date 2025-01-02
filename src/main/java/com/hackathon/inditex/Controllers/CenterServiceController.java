@@ -61,11 +61,12 @@ public class CenterServiceController {
 	// 0 points
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object> deleteLogisticsCenter(@PathVariable("id") Long id) {
-		if(centerServiceImpl.existsById(id))
+		Map<String, String> response = new HashMap<>();
+		if(centerServiceImpl.existsById(id)) {
 			centerServiceImpl.deleteById(id);
-    	Map<String, String> response = new HashMap<>();
-    	response.put("message", "Logistics center deleted successfully.");
-    	return new ResponseEntity(response, HttpStatus.OK);
+			response.put("message", "Logistics center deleted successfully.");
+		}
+    	return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	// 57 points
