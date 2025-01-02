@@ -50,7 +50,7 @@ public class CenterServiceController {
 		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
 			return ResponseHandler.generateResponse("Current load cannot exceed max capacity.",
 					HttpStatus.INTERNAL_SERVER_ERROR);
-		} else if (center.getCapacity().chars().anyMatch(c -> c != 'B' || c != 'M' || c != 'S')) {
+		} else if (!center.getCapacity().toUpperCase().chars().allMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
 			return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 		 /* else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
@@ -129,7 +129,7 @@ public class CenterServiceController {
 					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
 				return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
 			} */
-			else if (current.getCapacity().chars().anyMatch(c -> c != 'B' || c != 'M' || c != 'S')) {
+			else if (!current.getCapacity().toUpperCase().chars().allMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
 				return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
 			} 
 			else {
