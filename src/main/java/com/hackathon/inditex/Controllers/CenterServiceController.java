@@ -52,12 +52,7 @@ public class CenterServiceController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} else if (!center.getCapacity().toUpperCase().chars().allMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
 			return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
-		} 
-		 /* else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
-				.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-			return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
-		}b*/
-		else {
+		} else {
 			centerServiceImpl.save(center);
 			return ResponseHandler.generateResponse("Logistics center created successfully.", HttpStatus.CREATED);
 		}
@@ -124,12 +119,7 @@ public class CenterServiceController {
 			if (current.getCurrentLoad() > current.getMaxCapacity()) {
 				return ResponseHandler.generateResponse("Current load cannot exceed max capacity.",
 						HttpStatus.INTERNAL_SERVER_ERROR);
-			} 
-			/*else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
-					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
-				return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
-			} */
-			else if (!current.getCapacity().toUpperCase().chars().allMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
+			} else if (!current.getCapacity().toUpperCase().chars().allMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
 				return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
 			} 
 			else {
