@@ -3,6 +3,7 @@ package com.hackathon.inditex.Controllers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,10 +50,14 @@ public class CenterServiceController {
 		} else if (center.getCurrentLoad() > center.getMaxCapacity()) {
 			return ResponseHandler.generateResponse("Current load cannot exceed max capacity.",
 					HttpStatus.INTERNAL_SERVER_ERROR);
-		} else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
+		} else if (center.getCapacity().chars().anyMatch(c -> c != 'B' || c != 'M' || c != 'S')) {
+			return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
+		 /* else if (!center.getCapacity().toString().toUpperCase().chars().distinct()
 				.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
 			return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
-		} else {
+		}b*/
+		else {
 			centerServiceImpl.save(center);
 			return ResponseHandler.generateResponse("Logistics center created successfully.", HttpStatus.CREATED);
 		}
@@ -73,8 +78,9 @@ public class CenterServiceController {
 	@PatchMapping("/{id}")
 	public ResponseEntity<Object> updateDetailsLogisticsCenter(@PathVariable("id") Long id,
 			@RequestBody Map<String, Object> updates) {
-		if (centerServiceImpl.findById(id).isPresent()) {
-			Center current = centerServiceImpl.findById(id).get();
+		Optional<Center> optionalCenter = centerServiceImpl.findById(id);
+		if (optionalCenter.isPresent()) {
+			Center current = optionalCenter.get();
 			Coordinates currentCoordinates = current.getCoordinates();
 			updates.entrySet().forEach(entry -> {
 				if (entry.getValue() != null) {
@@ -118,10 +124,15 @@ public class CenterServiceController {
 			if (current.getCurrentLoad() > current.getMaxCapacity()) {
 				return ResponseHandler.generateResponse("Current load cannot exceed max capacity.",
 						HttpStatus.INTERNAL_SERVER_ERROR);
-			} else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
+			} 
+			/*else if (!current.getCapacity().toString().toUpperCase().chars().distinct()
 					.anyMatch(c -> c == 'B' || c == 'M' || c == 'S')) {
 				return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
-			} else {
+			} */
+			else if (current.getCapacity().chars().anyMatch(c -> c != 'B' || c != 'M' || c != 'S')) {
+				return ResponseHandler.generateResponse("Invalid center capacity.", HttpStatus.INTERNAL_SERVER_ERROR);
+			} 
+			else {
 				centerServiceImpl.save(current);
 				return ResponseHandler.generateResponse("Logistics center updated successfully.", HttpStatus.OK);
 			}
