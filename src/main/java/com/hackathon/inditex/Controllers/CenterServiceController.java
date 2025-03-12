@@ -21,8 +21,8 @@ import com.hackathon.inditex.DTO.CenterDTO;
 import com.hackathon.inditex.DTO.Mapper;
 import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Coordinates;
+import com.hackathon.inditex.Handlers.ResponseHandler;
 import com.hackathon.inditex.Services.CenterServiceImpl;
-import com.hackathon.inditex.handler.ResponseHandler;
 
 @RestController
 @RequestMapping("/api/centers")
