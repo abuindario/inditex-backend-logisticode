@@ -16,27 +16,27 @@ import com.hackathon.inditex.DTO.Mapper;
 import com.hackathon.inditex.DTO.OrderDTO;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Handlers.ResponseHandler;
-import com.hackathon.inditex.Services.OrderServiceImpl;
+import com.hackathon.inditex.Services.OrderService;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderServiceController {
 	@Autowired
-	OrderServiceImpl orderServiceImpl;
+	OrderService orderService;
 
 	public Mapper mapper = new Mapper();
 
 	// Remove this method before submitting the code !!
 	@DeleteMapping("/all")
 	public void deleteAllOrders() {
-		List<Order> allOrders = orderServiceImpl.findAll();
-		allOrders.stream().forEach(order -> orderServiceImpl.remove(order));
+		List<Order> allOrders = orderService.findAll();
+		allOrders.stream().forEach(order -> orderService.remove(order));
 	}
 	
 	// 100 points
 	@GetMapping("")
 	public ResponseEntity<List<Order>> readOrders() {
-		return new ResponseEntity<List<Order>>(orderServiceImpl.findAll(), HttpStatus.OK);
+		return new ResponseEntity<List<Order>>(orderService.findAll(), HttpStatus.OK);
 	}
 
 	// 0 points
@@ -46,7 +46,7 @@ public class OrderServiceController {
 		List<String> orderSize = List.of("B", "M", "S");
 		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 		if(orderSize.contains(order.getSize()) && order.getCustomerId() != null && (order.getCoordinates().getLatitude() != null && order.getCoordinates().getLongitude() != null)) {
-			orderServiceImpl.save(order);
+			orderService.save(order);
 			status = HttpStatus.CREATED;
 		}
 		String message = "Order created successfully in " + order.getStatus() +" status.";

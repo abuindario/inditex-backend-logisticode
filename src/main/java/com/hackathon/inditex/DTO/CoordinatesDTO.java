@@ -1,9 +1,11 @@
 package com.hackathon.inditex.DTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class CoordinatesDTO {
 	private Double latitude;
 	private Double longitude;

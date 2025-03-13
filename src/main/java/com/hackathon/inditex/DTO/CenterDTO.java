@@ -1,9 +1,11 @@
 package com.hackathon.inditex.DTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class CenterDTO {
 	private String name; 
 	private String capacity; 
@@ -11,4 +13,5 @@ public class CenterDTO {
 	private Integer maxCapacity;
 	private Integer currentLoad;
 	private CoordinatesDTO coordinates;
+	
 }

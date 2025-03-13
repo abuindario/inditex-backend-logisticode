@@ -16,8 +16,8 @@ import com.hackathon.inditex.DTO.Mapper;
 import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Handlers.ResponseHandler;
-import com.hackathon.inditex.Services.CenterServiceImpl;
-import com.hackathon.inditex.Services.OrderServiceImpl;
+import com.hackathon.inditex.Services.CenterService;
+import com.hackathon.inditex.Services.OrderService;
 
 @RestController
 @RequestMapping("/api/orders/order-assignations")
@@ -25,14 +25,14 @@ public class CenterOrderAssignment {
 	Mapper mapper = new Mapper();
 	
 	@Autowired
-	CenterServiceImpl centerServiceImpl;
+	CenterService centerService;
 	
 	@Autowired
-	OrderServiceImpl orderServiceImpl;
+	OrderService orderService;
 	
 	@PostMapping("")
 	public ResponseEntity<Object> assignCenterToOrder() {
-		List<Order> pendingOrderList = orderServiceImpl
+		List<Order> pendingOrderList = orderService
 										.findAll()
 										.stream()
 										.filter(order -> order.getStatus().equals("PENDING"))
@@ -43,7 +43,7 @@ public class CenterOrderAssignment {
 		}
 		
 		List<Map<String,Object>> cumulativeResponse = new ArrayList<>();
-		List<Center> allCenters = centerServiceImpl.findAll();
+		List<Center> allCenters = centerService.findAll();
 
 		pendingorders: for(int i=0; i<pendingOrderList.size(); i++) {
 
@@ -88,8 +88,8 @@ public class CenterOrderAssignment {
 			currentOrder.setStatus("ASSIGNED");
 			int initialLoad = assignedCenter.getCurrentLoad();
 			assignedCenter.setCurrentLoad(++initialLoad);
-			centerServiceImpl.save(assignedCenter);
-			orderServiceImpl.save(currentOrder);	
+			centerService.save(assignedCenter);
+			orderService.save(currentOrder);	
 			cumulativeResponse.add(ResponseHandler.generateResponse(distance, currentOrder.getId(), 
 					currentOrder.getAssignedCenter(), currentOrder.getStatus()));
 		}

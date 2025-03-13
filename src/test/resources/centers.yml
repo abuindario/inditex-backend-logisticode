@@ -1,0 +1,10 @@
+CENTERS:
+   - ID: 10
+     NAME: "CENTER B"
+     CAPACITY: "MS"
+     STATUS: "AVAILABLE"
+     CURRENT_LOAD: 5
+     MAX_CAPACITY: 10
+     LATITUDE: 48.8566
+     LONGITUDE: 2.3522
+     
