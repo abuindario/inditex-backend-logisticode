@@ -3,13 +3,17 @@ package com.hackathon.inditex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +39,7 @@ class InditexCenterITests {
 	@Test
 	void shouldReadLogisticsCenter() {
 		// GIVEN
-		Center expectedCenter = new Center(Long.valueOf(10), "CENTER B", "MS", "AVAILABLE", 5, 10, new Coordinates(48.8566, 2.3522));
+		Center expectedCenter = getExistingCenter();
 		
 		// WHEN
 		ResponseEntity<List<Center>> actualResponse = centerServiceController.readLogisticsCenters();
@@ -56,6 +60,10 @@ class InditexCenterITests {
 		assertEquals(expectedCenter.getCurrentLoad(), center.getCurrentLoad());
 		assertEquals(expectedCenter.getCoordinates().getLatitude(), center.getCoordinates().getLatitude());
 		assertEquals(expectedCenter.getCoordinates().getLongitude(), center.getCoordinates().getLongitude());
+	}
+
+	private Center getExistingCenter() {
+		return new Center(Long.valueOf(10), "CENTER B", "MS", "AVAILABLE", 5, 10, new Coordinates(48.8566, 2.3522));
 	}
 	
 	@Test
@@ -185,6 +193,53 @@ class InditexCenterITests {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> responseMap = (Map<String, Object>) actualResponse.getBody();
 		assertEquals("No logistics center found with the given ID.", responseMap.get("message"));
+	}
+	
+	@ParameterizedTest
+	@MethodSource
+	@ExpectedDataSet("centersExpected_AfterUpdate.yml")
+	void shouldUpdateCenter(Map<String, Object> updates) {
+		// GIVEN
+		Center existingCenter = getExistingCenter();
+		
+		// WHEN
+		ResponseEntity<?> actualResponse = centerServiceController.updateDetailsLogisticsCenter(existingCenter.getId(), updates);
+		
+		// THEN
+		assertNotNull(actualResponse, "actualResponse wasn't expected to be null");
+		assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+		assertNotNull(actualResponse.getBody(), "actualResponse.getBody() wasn't expected to be null");
+		@SuppressWarnings("unchecked")
+		Map<String, Object> responseMap = (Map<String, Object>) actualResponse.getBody();
+		assertEquals("Logistics center updated successfully.", responseMap.get("message"));
+	}
+	
+	private static Stream<Arguments> shouldUpdateCenter() {
+		return Stream.of(
+				Arguments.of(
+						Map.of("name", "UPDATED CENTER", "capacity", "B", "status", "FULL", "currentLoad", "16", "maxCapacity", "20", "latitude", "12.1234", "longitude", "12.1234"),
+						Map.of("name", "UPDATED CENTER", "capacity", "B", "status", "FULL", "currentLoad", "16", "maxCapacity", "20", "coordinates", Map.of("latitude", "12.1234", "longitude", "12.1234"))
+						)
+				);
+	}
+	
+	@ParameterizedTest
+	@CsvSource({"name, 'UPDATED CENTER'", "latitude, 12.1234"})
+	void shouldUpdateCenter(String key, String value) {
+		// GIVEN
+		Center existingCenter = getExistingCenter();
+		Map<String, Object> updates = Map.of(key, value);
+		
+		// WHEN
+		ResponseEntity<?> actualResponse = centerServiceController.updateDetailsLogisticsCenter(existingCenter.getId(), updates);
+		
+		// THEN
+		assertNotNull(actualResponse, "actualResponse wasn't expected to be null");
+		assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+		assertNotNull(actualResponse.getBody(), "actualResponse.getBody() wasn't expected to be null");
+		@SuppressWarnings("unchecked")
+		Map<String, Object> responseMap = (Map<String, Object>) actualResponse.getBody();
+		assertEquals("Logistics center updated successfully.", responseMap.get("message"));
 	}
 
 }
