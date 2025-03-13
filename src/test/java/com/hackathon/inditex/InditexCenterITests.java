@@ -150,5 +150,41 @@ class InditexCenterITests {
 		Map<String, Object> responseMap = (Map<String, Object>) actualResponse.getBody();
 		assertEquals("Invalid center capacity.", responseMap.get("message"));
 	}
+	
+	@Test
+	@ExpectedDataSet("centersExpected_afterDeletion.yml")
+	void shouldDeleteCenter() {
+		// GIVEN
+		Long existingCenterId = 10L;
+		
+		// WHEN
+		ResponseEntity<?> actualResponse = centerServiceController.deleteLogisticsCenter(existingCenterId);
+		
+		// THEN
+		assertNotNull(actualResponse, "actualResponse wasn't expected to be null");
+		assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+		assertNotNull(actualResponse.getBody(), "actualResponse.getBody() wasn't expected to be null");
+		@SuppressWarnings("unchecked")
+		Map<String, Object> responseMap = (Map<String, Object>) actualResponse.getBody();
+		assertEquals("Logistics center deleted successfully.", responseMap.get("message"));
+	}
+	
+	@Test
+	@ExpectedDataSet("centers.yml")
+	void shouldNotDeleteCenter_unexistingCenterId() {
+		// GIVEN
+		Long existingCenterId = 1L;
+		
+		// WHEN
+		ResponseEntity<?> actualResponse = centerServiceController.deleteLogisticsCenter(existingCenterId);
+		
+		// THEN
+		assertNotNull(actualResponse, "actualResponse wasn't expected to be null");
+		assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+		assertNotNull(actualResponse.getBody(), "actualResponse.getBody() wasn't expected to be null");
+		@SuppressWarnings("unchecked")
+		Map<String, Object> responseMap = (Map<String, Object>) actualResponse.getBody();
+		assertEquals("No logistics center found with the given ID.", responseMap.get("message"));
+	}
 
 }
