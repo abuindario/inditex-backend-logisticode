@@ -1,0 +1,15 @@
+ORDERS:
+   - ID: 1
+     CUSTOMER_ID: 123
+     SIZE: "B"
+     ASSIGNED_CENTER: 
+     STATUS: "PENDING"
+     LATITUDE: 40.7128
+     LONGITUDE: -74.0060
+   - ID: 10
+     CUSTOMER_ID: 1
+     SIZE: "B"
+     ASSIGNED_CENTER: "Center Name"
+     STATUS: "PENDING"
+     LATITUDE: 40.7128
+     LONGITUDE: -74.0060

@@ -32,7 +32,7 @@ public class Mapper {
 		order.setAssignedCenter(orderDTO.getAssignedCenter());
 		order.setCoordinates(toCoordinates(orderDTO.getCoordinates()));
 		order.setCustomerId(orderDTO.getCustomerId());
-		order.setSize(orderDTO.getSize());
+		order.setSize(orderDTO.getSize().toUpperCase());
 		order.setStatus("PENDING");
 		return order;
 	}

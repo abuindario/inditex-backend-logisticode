@@ -43,15 +43,16 @@ public class OrderServiceController {
 	@PostMapping("")
 	public ResponseEntity<Object> createNewOrder(@RequestBody OrderDTO orderDTO) {
 		Order order = mapper.toOrder(orderDTO);
-		List<String> orderSize = List.of("B", "M", "S");
-		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-		if(orderSize.contains(order.getSize()) && order.getCustomerId() != null && (order.getCoordinates().getLatitude() != null && order.getCoordinates().getLongitude() != null)) {
-			orderService.save(order);
-			status = HttpStatus.CREATED;
+		if(order.getSize() == null || !List.of("B", "M", "S").contains(order.getSize())) {
+			return ResponseHandler.generateResponse("Invalid order size, it must be a combination of B, M, S.", HttpStatus.BAD_REQUEST);
 		}
-		String message = "Order created successfully in " + order.getStatus() +" status.";
-		return ResponseHandler.generateResponse(order.getId(), order.getCustomerId(), order.getSize(), order.getAssignedCenter(),
-				order.getCoordinates(), order.getStatus(), message, status);
+		if(order.getCustomerId() != null && (order.getCoordinates().getLatitude() != null && order.getCoordinates().getLongitude() != null)) {
+			orderService.save(order);
+			return ResponseHandler.generateResponse(order.getId(), order.getCustomerId(), order.getSize(), order.getAssignedCenter(),
+					order.getCoordinates(), order.getStatus(), "Order created successfully in " + order.getStatus() +" status.", HttpStatus.CREATED);
+		} else {
+			return ResponseHandler.generateResponse("Order parameters must not be null", HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 }
