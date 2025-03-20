@@ -21,7 +21,7 @@ public class OrderServiceImpl implements OrderService {
 		if(orderDto.size().equalsIgnoreCase("B") || 
 				orderDto.size().equalsIgnoreCase("M") ||
 				orderDto.size().equalsIgnoreCase("S")) {
-			order.setSize(orderDto.size());
+			order.setSize(orderDto.size().toUpperCase());
 		} else {
 			throw new IllegalArgumentException("Invalid order size, it must be B, M or S.");
 		}
