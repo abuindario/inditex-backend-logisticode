@@ -18,13 +18,13 @@ public class OrderServiceImpl implements OrderService {
 	public Order createOrder(OrderDTO orderDto) {
 		Order order = new Order();
 		order.setCustomerId(orderDto.customerId());
-		if(orderDto.size().equalsIgnoreCase("B") || 
-				orderDto.size().equalsIgnoreCase("M") ||
-				orderDto.size().equalsIgnoreCase("S")) {
+//		if(orderDto.size().equalsIgnoreCase("B") || 
+//				orderDto.size().equalsIgnoreCase("M") ||
+//				orderDto.size().equalsIgnoreCase("S")) {
 			order.setSize(orderDto.size().toUpperCase());
-		} else {
-			throw new IllegalArgumentException("Invalid order size, it must be B, M or S.");
-		}
+//		} else {
+//			throw new IllegalArgumentException("Invalid order size, it must be B, M or S.");
+//		}
 		order.setStatus("PENDING");
 		order.setAssignedCenter(null);
 		order.setCoordinates(orderDto.coordinates());

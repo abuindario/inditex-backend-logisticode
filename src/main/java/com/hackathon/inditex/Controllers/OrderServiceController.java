@@ -36,8 +36,8 @@ public class OrderServiceController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 	
-//	@GetMapping("/api/orders")
-//	public ResponseEntity<?> readOrders() {
-//		return ResponseEntity.ok(orderService.readOrders());
-//	}
+	@GetMapping("/api/orders")
+	public ResponseEntity<?> readOrders() {
+		return ResponseEntity.ok(orderService.readOrders());
+	}
 }
