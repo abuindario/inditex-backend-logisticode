@@ -2,6 +2,7 @@ package com.hackathon.inditex.Services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -39,12 +40,14 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	@Transactional
 	public void deleteLogisticsCenterById(int id) {
+		Objects.requireNonNull(id, "ID must not be null");
 		centerRepository.deleteById(Long.valueOf(id));
 	}
 	
 	@Override
 	@Transactional
 	public void saveCenter(Center center) {
+		Objects.requireNonNull(center, "Center must not be null");
 		centerRepository.save(center);
 	}
 	
@@ -74,6 +77,7 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	@Transactional
 	public Center createLogisticsCenter(CenterDTO centerDto) {
+		Objects.requireNonNull(centerDto, "CenterDTO must not be null");
 		return centerRepository.save(mapCenterDtoToCenter(centerDto));
 	}
 
@@ -91,46 +95,6 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	public Center updateCenter(Center center, Map<String, Object> updates) {
 	    updates.forEach((key, value) -> updateCenterField(center, key, value));
-		/*
-		updates.entrySet().forEach(entry -> {
-			if (entry.getValue() != null) {
-				Object updatedValue = entry.getValue();
-				switch (entry.getKey()) {
-				case "name":
-					center.setName(updatedValue.toString());
-					break;
-				case "capacity":
-					center.setCapacity(updatedValue.toString());
-					break;
-				case "status":
-					center.setStatus(updatedValue.toString());
-					break;
-				case "maxCapacity":
-					center.setMaxCapacity(Integer.valueOf(updatedValue.toString()));
-					break;
-				case "currentLoad":
-					center.setCurrentLoad(Integer.valueOf(updatedValue.toString()));
-					break;
-				case "longitude":
-					center.getCoordinates().setLongitude(Double.valueOf(updatedValue.toString()));
-					break;
-				case "latitude":
-					center.getCoordinates().setLatitude(Double.valueOf(updatedValue.toString()));
-					break;
-				case "coordinates":
-					Map<String, Double> updatedCoordinatesMap = (Map<String, Double>) updatedValue;
-					updatedCoordinatesMap.entrySet().forEach(coor -> {
-						if (coor.getKey().toString().equals("longitude")) {
-							center.getCoordinates().setLongitude(coor.getValue());
-						} else if (coor.getKey().toString().equals("latitude")) {
-							center.getCoordinates().setLatitude(coor.getValue());
-						}
-					});
-					break;
-				}
-			}
-		});
-		*/
 		return center;
 	}
 	
