@@ -23,15 +23,16 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order createOrder(OrderDTO orderDto) {
+		return orderRepository.save(populateOrderFromOrderDto(orderDto));
+	}
+
+	private Order populateOrderFromOrderDto(OrderDTO orderDto) {
 		Order order = new Order();
 		order.setCustomerId(orderDto.customerId());
 		order.setSize(orderDto.size().toUpperCase());
 		order.setStatus("PENDING");
 		order.setAssignedCenter(null);
 		order.setCoordinates(orderDto.coordinates());
-
-		orderRepository.save(order);
-
 		return order;
 	}
 
