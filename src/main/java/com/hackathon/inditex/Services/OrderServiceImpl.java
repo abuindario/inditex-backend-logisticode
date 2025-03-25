@@ -57,38 +57,32 @@ public class OrderServiceImpl implements OrderService {
 	@Transactional
 	public Map<String, List<Map<String, Object>>> assignCentersToPendingOrders() {
 		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
-
-		List<Order> pendingOrders = getPendingOrders();
-
-		for (Order order : pendingOrders) {
-
+		for (Order order : getPendingOrders()) {
 			List<Center> centersMatchingOrderSize = getCentersMatchingOrderSize(order);
-
-			if (centersMatchingOrderSize.isEmpty()) {
+			if (isEmpty(centersMatchingOrderSize)) {
 				addToProcessedOrderList(processedOrdersList, null, order.getId(), null,
 						NO_AVAILABLE_CENTERS_SUPPORT_THE_ORDER_TYPE, STATUS_PENDING);
 				continue;
 			}
-
 			List<Center> availableCentersMatchingOrderSize = getAvailableCenters(centersMatchingOrderSize);
-
-			if (availableCentersMatchingOrderSize.isEmpty()) {
+			if (isEmpty(availableCentersMatchingOrderSize)) {
 				addToProcessedOrderList(processedOrdersList, null, order.getId(), null,
 						ALL_CENTERS_ARE_AT_MAXIMUM_CAPACITY, STATUS_PENDING);
 				continue;
 			}
-
 			Center assignedCenter = availableCentersMatchingOrderSize.stream()
 					.min(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
 					.orElseThrow(() -> new IllegalStateException(NO_AVAILABLE_CENTER_FOUND_FOR_THE_ORDER));
-
-			assingAndUpdateOrderAndCenter(order, assignedCenter);
-
+			assignAndUpdateOrderAndCenter(order, assignedCenter);
 			addToProcessedOrderList(processedOrdersList,
 					calculateDistance(assignedCenter.getCoordinates(), order.getCoordinates()), order.getId(),
 					assignedCenter.getName(), "", STATUS_ASSIGNED);
 		}
 		return Map.of("processed-orders", processedOrdersList);
+	}
+
+	private boolean isEmpty(List<Center> centersMatchingOrderSize) {
+		return centersMatchingOrderSize.isEmpty();
 	}
 
 	private void addToProcessedOrderList(List<Map<String, Object>> processedOrdersList, Double distance, Long orderId,
@@ -108,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
 		return processedOrdersMap;
 	}
 
-	private void assingAndUpdateOrderAndCenter(Order order, Center assignedCenter) {
+	private void assignAndUpdateOrderAndCenter(Order order, Center assignedCenter) {
 		order.setAssignedCenter(assignedCenter.getName());
 		order.setStatus(STATUS_ASSIGNED);
 
