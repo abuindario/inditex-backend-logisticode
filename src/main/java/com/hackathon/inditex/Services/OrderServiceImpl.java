@@ -88,13 +88,7 @@ public class OrderServiceImpl implements OrderService {
 					.min(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
 				    .orElseThrow(() -> new IllegalStateException("No available center found for the order."));
 			
-			order.setAssignedCenter(assignedCenter.getName()); 
-			order.setStatus(STATUS_ASSIGNED);
-
-			assignedCenter.setCurrentLoad( assignedCenter.getCurrentLoad() +1 );
-			  
-			orderRepository.save(order); 
-			centerService.saveCenter(assignedCenter);
+			assingAndUpdateOrderAndCenter(order, assignedCenter);
 			  
 			processedOrdersMap.put("distance", calculateDistance(assignedCenter.getCoordinates(), order.getCoordinates())); 
 			processedOrdersMap.put("orderId", order.getId());
@@ -103,9 +97,17 @@ public class OrderServiceImpl implements OrderService {
 			  
 			processedOrdersList.add(processedOrdersMap);
 		}
-		Map<String, List<Map<String, Object>>> response = new LinkedHashMap<>();
-		response.put("processed-orders", processedOrdersList);
-		return response;
+		return Map.of("processed-orders", processedOrdersList);
+	}
+
+	private void assingAndUpdateOrderAndCenter(Order order, Center assignedCenter) {
+		order.setAssignedCenter(assignedCenter.getName()); 
+		order.setStatus(STATUS_ASSIGNED);
+
+		assignedCenter.setCurrentLoad( assignedCenter.getCurrentLoad() +1 );
+		  
+		orderRepository.save(order); 
+		centerService.saveCenter(assignedCenter);
 	}
 
 	private List<Center> getAvailableCenters(List<Center> centerList) {
