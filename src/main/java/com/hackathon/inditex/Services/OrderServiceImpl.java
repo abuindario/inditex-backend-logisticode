@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
 			
 			List<Center> centersMatchingOrderSize = getCentersMatchingOrderSize(order);
 			
-			if(centersMatchingOrderSize.size() == 0) {
+			if(centersMatchingOrderSize.isEmpty()) {
 				processedOrdersMap.put("distance", null); 
 				processedOrdersMap.put("orderId", order.getId());
 				processedOrdersMap.put("assignedLogisticsCenter", null);
@@ -74,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
 			
 			List<Center> availableCentersMatchingOrderSize = getAvailableCenters(centersMatchingOrderSize);
 			
-			if(availableCentersMatchingOrderSize.size() == 0) {
+			if(availableCentersMatchingOrderSize.isEmpty()) {
 				processedOrdersMap.put("distance", null); 
 				processedOrdersMap.put("orderId", order.getId());
 				processedOrdersMap.put("assignedLogisticsCenter", null);
