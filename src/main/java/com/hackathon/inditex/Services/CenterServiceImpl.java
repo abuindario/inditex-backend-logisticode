@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hackathon.inditex.DTO.CenterDTO;
@@ -14,8 +13,11 @@ import com.hackathon.inditex.Repositories.CenterRepository;
 
 @Service
 public class CenterServiceImpl implements CenterService {
-	@Autowired
-	CenterRepository centerRepository;
+	private CenterRepository centerRepository;
+	
+	public CenterServiceImpl(CenterRepository centerRepository) {
+		this.centerRepository = centerRepository;
+	}
 
 	@Override
 	public boolean exceedsMaxCapacity(CenterDTO centerDto) {
