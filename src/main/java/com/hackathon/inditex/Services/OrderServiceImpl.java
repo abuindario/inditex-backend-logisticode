@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hackathon.inditex.DTO.OrderDTO;
@@ -20,8 +19,13 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-	@Autowired
-	OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final CenterService centerService;
+
+    public OrderServiceImpl(OrderRepository orderRepository, CenterService centerService) {
+        this.orderRepository = orderRepository;
+        this.centerService = centerService;
+    }
 
 	@Override
 	@Transactional
@@ -43,9 +47,6 @@ public class OrderServiceImpl implements OrderService {
 	public List<Order> readOrders() {
 		return (List<Order>) orderRepository.findAll();
 	}
-
-	@Autowired
-	CenterService centerService;
 
 	@Override
 	@Transactional
@@ -89,10 +90,9 @@ public class OrderServiceImpl implements OrderService {
 			}
 			
 			Center assignedCenter = availableCentersFilteredBySize.stream()
-					.sorted(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
-					.findFirst()
-					.get();
-	
+					.min(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
+				    .orElseThrow(() -> new IllegalStateException("No available center found for the order."));
+			
 			order.setAssignedCenter(assignedCenter.getName()); 
 			order.setStatus("ASSIGNED");
 
