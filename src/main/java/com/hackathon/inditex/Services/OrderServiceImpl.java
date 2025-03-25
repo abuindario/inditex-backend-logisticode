@@ -113,11 +113,11 @@ public class OrderServiceImpl implements OrderService {
 		return response;
 	}
 
-	private LinkedList<Order> getPendingOrders() {
+	private List<Order> getPendingOrders() {
 		return readOrders().stream()
 				.filter(o -> o.getStatus().equals(STATUS_PENDING))
 				.sorted(Comparator.comparingLong(o -> o.getId()))
-				.collect(Collectors.toCollection(LinkedList::new));
+				.toList();
 	}
 
 	private double calculateDistance(Coordinates centerCoordinates, Coordinates orderCoordinates) {
