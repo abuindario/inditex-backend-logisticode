@@ -49,10 +49,7 @@ public class OrderServiceImpl implements OrderService {
 		Map<String, List<Map<String, Object>>> response = new LinkedHashMap<>();
 		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
 
-		List<Order> pendingOrderList = readOrders().stream()
-				.filter(o -> o.getStatus().equals("PENDING"))
-				.sorted(Comparator.comparingLong(o -> o.getId()))
-				.collect(Collectors.toCollection(LinkedList::new));
+		List<Order> pendingOrderList = getPendingOrders();
 
 		List<Center> centerList = centerService.readLogisticsCenters();
 
@@ -109,6 +106,13 @@ public class OrderServiceImpl implements OrderService {
 		}
 		response.put("processed-orders", processedOrdersList);
 		return response;
+	}
+
+	private List<Order> getPendingOrders() {
+		return readOrders().stream()
+				.filter(o -> o.getStatus().equals("PENDING"))
+				.sorted(Comparator.comparingLong(o -> o.getId()))
+				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	private double calculateDistance(Coordinates centerCoordinates, Coordinates orderCoordinates) {
