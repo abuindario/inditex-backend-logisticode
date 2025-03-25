@@ -1,5 +1,5 @@
 ### Build the project
-FROM openjdk:21-jdk AS build
+FROM maven:3.9.9-amazoncorretto-21-al2023 AS build
 
 WORKDIR /app
 
@@ -8,10 +8,10 @@ COPY pom.xml ./
 COPY .mvn .mvn
 COPY src ./src
 
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
 ### Run the application
-FROM openjdk:21-jdk
+FROM amazoncorretto:21.0.6-al2023-headless
 
 WORKDIR /app
 
