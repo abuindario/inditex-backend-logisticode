@@ -3,6 +3,7 @@ package com.hackathon.inditex.Controllers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,19 +29,16 @@ public class CenterServiceController {
 	
 	@PostMapping("/api/centers")
 	public ResponseEntity<Map<String, String>> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
-		// Check for another center in that position
 		if(centerService.existsCenterInCoordinates(centerDto.coordinates())) {
 			response.put("message", "There is already a logistics center in that position.");
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		// Verify currentLoad doesn't exceed maxCapacity
 		if(centerService.exceedsMaxCapacity(centerDto)) {
 			response.put("message", "Current load cannot exceed max capacity.");
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		// Create logistics center
 		centerService.createLogisticsCenter(centerDto);
 		
 		response.put("message", "Logistics center created successfully.");
@@ -61,16 +59,14 @@ public class CenterServiceController {
 	
 	@PatchMapping("/api/centers/{id}")
 	public ResponseEntity<Map<String, String>> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
-		// Find center, if exists
-		if(centerService.findCenterById(id).isEmpty()) {
+		Optional<Center> centerOpt = centerService.findCenterById(id);
+		if(centerOpt.isEmpty()) {
 			response.put("message", "Center not found.");
 			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);			
 		}
 		
-		Center center = centerService.findCenterById(id).get();
-		center = centerService.updateCenter(center, updates);
+		Center center = centerService.updateCenter(centerOpt.get(), updates);
 		
-		// Check for another center in that position
 		if(updates.containsKey("coordinates") || updates.containsKey("latitude") || updates.containsKey("longitude")) {
 			if(centerService.duplicatedCenterInCoordinates(center.getCoordinates())) {
 				response.put("message", "There is already a logistics center in that position.");
@@ -78,13 +74,11 @@ public class CenterServiceController {
 			}
 		}
 		
-		// Verify currentLoad doesn't exceed maxCapacity
 		if(centerService.exceedsMaxCapacity(center)) {
 			response.put("message", "Current load cannot exceed max capacity.");
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);		
 		}
 		
-		// Save center to database
 		centerService.saveCenter(center);
 		
 		response.put("message", "Logistics center updated successfully.");
