@@ -21,6 +21,7 @@ import jakarta.transaction.Transactional;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CenterService centerService;
+    private static final double EARTH_RADIUS_KM = 6371.0;
 
     public OrderServiceImpl(OrderRepository orderRepository, CenterService centerService) {
         this.orderRepository = orderRepository;
@@ -114,17 +115,17 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	private double calculateDistance(Coordinates centerCoordinates, Coordinates orderCoordinates) {
-		double dLat = Math.toRadians((orderCoordinates.getLatitude() - centerCoordinates.getLatitude()));
-		double dLong = Math.toRadians((orderCoordinates.getLongitude() - centerCoordinates.getLongitude()));
+	    double dLat = Math.toRadians(orderCoordinates.getLatitude() - centerCoordinates.getLatitude());
+	    double dLong = Math.toRadians(orderCoordinates.getLongitude() - centerCoordinates.getLongitude());
 
-		double centerLat = Math.toRadians(centerCoordinates.getLatitude());
-		double orderLat = Math.toRadians(orderCoordinates.getLatitude());
+	    double centerLat = Math.toRadians(centerCoordinates.getLatitude());
+	    double orderLat = Math.toRadians(orderCoordinates.getLatitude());
 
-		double a = Math.pow(Math.sin(dLat / 2), 2)
-				+ Math.cos(centerLat) * Math.cos(orderLat) * Math.pow(Math.sin(dLong / 2), 2);
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	    double a = Math.pow(Math.sin(dLat / 2), 2)
+	            + Math.cos(centerLat) * Math.cos(orderLat) * Math.pow(Math.sin(dLong / 2), 2);
+	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-		return 6371 * c;
+	    return EARTH_RADIUS_KM * c;
 	}
 
 }
