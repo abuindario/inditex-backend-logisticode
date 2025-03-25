@@ -52,8 +52,7 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	public boolean existsCenterInCoordinates(Coordinates coordinates) {
 		return readLogisticsCenters().stream()
-			.filter(c -> c.getCoordinates().getLatitude().equals(coordinates.getLatitude()) && 
-					c.getCoordinates().getLongitude().equals(coordinates.getLongitude()))
+			.filter(c -> matchesCoordinates(c, coordinates))
 			.findFirst()
 			.isPresent();
 	}
@@ -61,9 +60,13 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	public boolean duplicatedCenterInCoordinates(Coordinates coordinates) {
 		return readLogisticsCenters().stream()
-				.filter(c -> c.getCoordinates().getLatitude().equals(coordinates.getLatitude()) && 
-						c.getCoordinates().getLongitude().equals(coordinates.getLongitude()))
+				.filter(c -> matchesCoordinates(c, coordinates))
 				.count() > 1;
+	}
+	
+	private boolean matchesCoordinates(Center center, Coordinates coordinates) {
+		return center.getCoordinates().getLatitude().equals(coordinates.getLatitude()) && 
+		center.getCoordinates().getLongitude().equals(coordinates.getLongitude());
 	}
 	
 	@Override
