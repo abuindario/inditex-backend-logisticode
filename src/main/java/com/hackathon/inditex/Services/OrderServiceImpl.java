@@ -46,7 +46,6 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Map<String, List<Map<String, Object>>> assignLogisticsCenterToOrders() {
-		Map<String, List<Map<String, Object>>> response = new LinkedHashMap<>();
 		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
 
 		List<Order> pendingOrderList = readOrders().stream()
@@ -54,14 +53,10 @@ public class OrderServiceImpl implements OrderService {
 				.sorted(Comparator.comparingLong(o -> o.getId()))
 				.collect(Collectors.toCollection(LinkedList::new));
 
-		List<Center> centerList = centerService.readLogisticsCenters();
-
 		OUTER: for (Order order : pendingOrderList) {
 			Map<String, Object> processedOrdersMap = new LinkedHashMap<>();
 			
-			List<Center> centerListFilteredBySize = centerList.stream()
-				.filter(c -> c.getCapacity().equals(order.getSize()))
-				.collect(Collectors.toCollection(LinkedList::new));
+			List<Center> centerListFilteredBySize = getCentersMatchingOrderSize(order);
 			
 			if(centerListFilteredBySize.size() == 0) {
 				processedOrdersMap.put("distance", null); 
@@ -73,9 +68,7 @@ public class OrderServiceImpl implements OrderService {
 				continue OUTER;
 			}
 			
-			List<Center> availableCentersFilteredBySize = centerListFilteredBySize.stream()
-					.filter(c -> c.getCurrentLoad() < c.getMaxCapacity())
-					.collect(Collectors.toCollection(LinkedList::new));
+			List<Center> availableCentersFilteredBySize = getAvailableCenters(centerListFilteredBySize);
 			
 			if(availableCentersFilteredBySize.size() == 0) {
 				processedOrdersMap.put("distance", null); 
@@ -87,10 +80,7 @@ public class OrderServiceImpl implements OrderService {
 				continue OUTER;
 			}
 			
-			Center assignedCenter = availableCentersFilteredBySize.stream()
-				.sorted(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
-				.findFirst()
-				.get();
+			Center assignedCenter = findClosestCenter(order, availableCentersFilteredBySize);
 	
 			order.setAssignedCenter(assignedCenter.getName()); 
 			order.setStatus("ASSIGNED");
@@ -107,8 +97,30 @@ public class OrderServiceImpl implements OrderService {
 			  
 			processedOrdersList.add(processedOrdersMap);
 		}
+		Map<String, List<Map<String, Object>>> response = new LinkedHashMap<>();
 		response.put("processed-orders", processedOrdersList);
 		return response;
+	}
+
+	private Center findClosestCenter(Order order, List<Center> availableCentersFilteredBySize) {
+		Center assignedCenter = availableCentersFilteredBySize.stream()
+			.sorted(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
+			.findFirst()
+			.get();
+		return assignedCenter;
+	}
+
+	private List<Center> getCentersMatchingOrderSize(Order order) {
+		List<Center> centerListFilteredBySize = centerService.readLogisticsCenters().stream()
+			.filter(c -> c.getCapacity().equals(order.getSize()))
+			.collect(Collectors.toCollection(LinkedList::new));
+		return centerListFilteredBySize;
+	}
+
+	private List<Center> getAvailableCenters(List<Center> centerListFilteredBySize) {
+		return centerListFilteredBySize.stream()
+				.filter(c -> c.getCurrentLoad() < c.getMaxCapacity())
+				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	private double calculateDistance(Coordinates centerCoordinates, Coordinates orderCoordinates) {
