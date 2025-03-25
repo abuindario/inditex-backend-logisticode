@@ -70,12 +70,14 @@ public class OrderServiceImpl implements OrderService {
 						ALL_CENTERS_ARE_AT_MAXIMUM_CAPACITY, STATUS_PENDING);
 				continue;
 			}
-			Center assignedCenter = availableCentersMatchingOrderSize.stream()
-					.min(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
-					.orElseThrow(() -> new IllegalStateException(NO_AVAILABLE_CENTER_FOUND_FOR_THE_ORDER));
+			Map.Entry<Center, Double> assignedCenterAndDistance = availableCentersMatchingOrderSize.stream()
+				    .map(center -> Map.entry(center, calculateDistance(center.getCoordinates(), order.getCoordinates())))
+				    .min(Comparator.comparingDouble(Map.Entry::getValue))
+				    .orElseThrow(() -> new IllegalStateException(NO_AVAILABLE_CENTER_FOUND_FOR_THE_ORDER));
+			Center assignedCenter = assignedCenterAndDistance.getKey();
 			assignAndUpdateOrderAndCenter(order, assignedCenter);
 			addToProcessedOrderList(processedOrdersList,
-					calculateDistance(assignedCenter.getCoordinates(), order.getCoordinates()), order.getId(),
+					assignedCenterAndDistance.getValue(), order.getId(),
 					assignedCenter.getName(), "", STATUS_ASSIGNED);
 		}
 		return Map.of("processed-orders", processedOrdersList);
