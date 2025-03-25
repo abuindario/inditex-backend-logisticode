@@ -11,6 +11,8 @@ import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Repositories.CenterRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class CenterServiceImpl implements CenterService {
 	private CenterRepository centerRepository;
@@ -35,11 +37,13 @@ public class CenterServiceImpl implements CenterService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteLogisticsCenterById(int id) {
 		centerRepository.deleteById(Long.valueOf(id));
 	}
 	
 	@Override
+	@Transactional
 	public void saveCenter(Center center) {
 		centerRepository.save(center);
 	}
@@ -68,6 +72,7 @@ public class CenterServiceImpl implements CenterService {
 	}
 	
 	@Override
+	@Transactional
 	public Center createLogisticsCenter(CenterDTO centerDto) {
 		return centerRepository.save(mapCenterDtoToCenter(centerDto));
 	}

@@ -16,12 +16,15 @@ import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Repositories.OrderRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class OrderServiceImpl implements OrderService {
 	@Autowired
 	OrderRepository orderRepository;
 
 	@Override
+	@Transactional
 	public Order createOrder(OrderDTO orderDto) {
 		return orderRepository.save(populateOrderFromOrderDto(orderDto));
 	}
@@ -45,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
 	CenterService centerService;
 
 	@Override
+	@Transactional
 	public Map<String, List<Map<String, Object>>> assignLogisticsCenterToOrders() {
 		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
 
