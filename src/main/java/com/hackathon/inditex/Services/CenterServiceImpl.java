@@ -16,23 +16,37 @@ import com.hackathon.inditex.Repositories.CenterRepository;
 public class CenterServiceImpl implements CenterService {
 	@Autowired
 	CenterRepository centerRepository;
+
+	@Override
+	public boolean exceedsMaxCapacity(CenterDTO centerDto) {
+		return centerDto.currentLoad() > centerDto.maxCapacity();
+	}
 	
 	@Override
-	public Center createLogisticsCenter(CenterDTO centerDto) {
-		return centerRepository.save(mapCenterDtoToCenter(centerDto));
+	public boolean exceedsMaxCapacity(Center center) {
+		return center.getCurrentLoad() > center.getMaxCapacity();
 	}
 
-	private Center mapCenterDtoToCenter(CenterDTO centerDto) {
-		Center center = new Center();
-		center.setName(centerDto.name());
-		center.setCapacity(centerDto.capacity());
-		center.setStatus(centerDto.status());
-		center.setCurrentLoad(centerDto.currentLoad());
-		center.setMaxCapacity(centerDto.maxCapacity());
-		center.setCoordinates(centerDto.coordinates());
-		return center;
+	@Override
+	public List<Center> readLogisticsCenters() {
+		return (List<Center>) centerRepository.findAll();
 	}
 
+	@Override
+	public void deleteLogisticsCenterById(int id) {
+		centerRepository.deleteById(Long.valueOf(id));
+	}
+	
+	@Override
+	public void saveCenter(Center center) {
+		centerRepository.save(center);
+	}
+	
+	@Override
+	public Optional<Center> findCenterById(int id) {
+		return centerRepository.findById(Long.valueOf(id));
+	}
+	
 	@Override
 	public boolean existsCenterInCoordinates(Coordinates coordinates) {
 		return readLogisticsCenters().stream()
@@ -49,20 +63,21 @@ public class CenterServiceImpl implements CenterService {
 						c.getCoordinates().getLongitude().equals(coordinates.getLongitude()))
 				.count() > 1;
 	}
-
+	
 	@Override
-	public boolean exceedsMaxCapacity(CenterDTO centerDto) {
-		return centerDto.currentLoad() > centerDto.maxCapacity();
+	public Center createLogisticsCenter(CenterDTO centerDto) {
+		return centerRepository.save(mapCenterDtoToCenter(centerDto));
 	}
 
-	@Override
-	public List<Center> readLogisticsCenters() {
-		return (List<Center>) centerRepository.findAll();
-	}
-
-	@Override
-	public void deleteLogisticsCenterById(int id) {
-		centerRepository.deleteById(Long.valueOf(id));
+	private Center mapCenterDtoToCenter(CenterDTO centerDto) {
+		Center center = new Center();
+		center.setName(centerDto.name());
+		center.setCapacity(centerDto.capacity());
+		center.setStatus(centerDto.status());
+		center.setCurrentLoad(centerDto.currentLoad());
+		center.setMaxCapacity(centerDto.maxCapacity());
+		center.setCoordinates(centerDto.coordinates());
+		return center;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,20 +123,4 @@ public class CenterServiceImpl implements CenterService {
 		});
 		return center;
 	}
-	
-	@Override
-	public Optional<Center> findCenterById(int id) {
-		return centerRepository.findById(Long.valueOf(id));
-	}
-	
-	@Override
-	public boolean exceedsMaxCapacity(Center center) {
-		return center.getCurrentLoad() > center.getMaxCapacity();
-	}
-
-	@Override
-	public void saveCenter(Center center) {
-		centerRepository.save(center);
-	}
-
 }

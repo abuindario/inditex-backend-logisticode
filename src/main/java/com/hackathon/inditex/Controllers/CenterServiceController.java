@@ -22,27 +22,22 @@ import com.hackathon.inditex.Services.CenterService;
 
 @RestController
 public class CenterServiceController {
-	private Map<String, String> response = new HashMap<>();
-
 	@Autowired
 	CenterService centerService;
 	
 	@PostMapping("/api/centers")
 	public ResponseEntity<Map<String, String>> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
 		if(centerService.existsCenterInCoordinates(centerDto.coordinates())) {
-			response.put("message", "There is already a logistics center in that position.");
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(ResponseHandler.setResponseMessage("There is already a logistics center in that position."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		if(centerService.exceedsMaxCapacity(centerDto)) {
-			response.put("message", "Current load cannot exceed max capacity.");
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(ResponseHandler.setResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		centerService.createLogisticsCenter(centerDto);
 		
-		response.put("message", "Logistics center created successfully.");
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
+		return new ResponseEntity<>(ResponseHandler.setResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/api/centers")
@@ -53,35 +48,40 @@ public class CenterServiceController {
 	@DeleteMapping("/api/centers/{id}")
 	public ResponseEntity<Map<String, String>> deleteLogisticsCenterById(@PathVariable("id") int id) {
 		centerService.deleteLogisticsCenterById(id);
-		response.put("message", "Logistics center deleted successfully.");
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(ResponseHandler.setResponseMessage("Logistics center deleted successfully."));
 	}
 	
 	@PatchMapping("/api/centers/{id}")
 	public ResponseEntity<Map<String, String>> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
 		Optional<Center> centerOpt = centerService.findCenterById(id);
 		if(centerOpt.isEmpty()) {
-			response.put("message", "Center not found.");
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);			
+			return new ResponseEntity<>(ResponseHandler.setResponseMessage("Center not found."), HttpStatus.NOT_FOUND);			
 		}
 		
 		Center center = centerService.updateCenter(centerOpt.get(), updates);
 		
 		if(updates.containsKey("coordinates") || updates.containsKey("latitude") || updates.containsKey("longitude")) {
 			if(centerService.duplicatedCenterInCoordinates(center.getCoordinates())) {
-				response.put("message", "There is already a logistics center in that position.");
-				return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<>(ResponseHandler.setResponseMessage("There is already a logistics center in that position."), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
 		if(centerService.exceedsMaxCapacity(center)) {
-			response.put("message", "Current load cannot exceed max capacity.");
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);		
+			return new ResponseEntity<>(ResponseHandler.setResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);		
 		}
 		
 		centerService.saveCenter(center);
 		
-		response.put("message", "Logistics center updated successfully.");
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(ResponseHandler.setResponseMessage("Logistics center updated successfully."));
 	}
+}
+
+class ResponseHandler {
+	
+	public static Map<String, String> setResponseMessage (String message) {
+		Map<String, String> response = new HashMap<>();
+		response.put("message", message);
+		return response;
+	}
+	
 }
