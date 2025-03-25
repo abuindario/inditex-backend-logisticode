@@ -58,29 +58,18 @@ public class OrderServiceImpl implements OrderService {
 		List<Order> pendingOrders = getPendingOrders();
 
 		OUTER: for (Order order : pendingOrders) {
-			Map<String, Object> processedOrdersMap = new LinkedHashMap<>();
 			
 			List<Center> centersMatchingOrderSize = getCentersMatchingOrderSize(order);
 			
 			if(centersMatchingOrderSize.isEmpty()) {
-				processedOrdersMap.put("distance", null); 
-				processedOrdersMap.put("orderId", order.getId());
-				processedOrdersMap.put("assignedLogisticsCenter", null);
-				processedOrdersMap.put("message", "No available centers support the order type.");
-				processedOrdersMap.put("status", STATUS_PENDING);
-				processedOrdersList.add(processedOrdersMap);
+				processedOrdersList.add(createProcessedOrderMap(order.getId(), null, null, "No available centers support the order type.", STATUS_PENDING));
 				continue OUTER;
 			}
 			
 			List<Center> availableCentersMatchingOrderSize = getAvailableCenters(centersMatchingOrderSize);
 			
 			if(availableCentersMatchingOrderSize.isEmpty()) {
-				processedOrdersMap.put("distance", null); 
-				processedOrdersMap.put("orderId", order.getId());
-				processedOrdersMap.put("assignedLogisticsCenter", null);
-				processedOrdersMap.put("message", "All centers are at maximum capacity.");
-				processedOrdersMap.put("status", STATUS_PENDING);
-				processedOrdersList.add(processedOrdersMap);
+				processedOrdersList.add(createProcessedOrderMap(order.getId(), null, null, "All centers are at maximum capacity.", STATUS_PENDING));
 				continue OUTER;
 			}
 			
@@ -90,14 +79,24 @@ public class OrderServiceImpl implements OrderService {
 			
 			assingAndUpdateOrderAndCenter(order, assignedCenter);
 			  
-			processedOrdersMap.put("distance", calculateDistance(assignedCenter.getCoordinates(), order.getCoordinates())); 
-			processedOrdersMap.put("orderId", order.getId());
-			processedOrdersMap.put("assignedLogisticsCenter", assignedCenter.getName());
-			processedOrdersMap.put("status", STATUS_ASSIGNED);
-			  
-			processedOrdersList.add(processedOrdersMap);
+			processedOrdersList.add(createProcessedOrderMap(order.getId(),
+					calculateDistance(assignedCenter.getCoordinates(), order.getCoordinates()), 
+					assignedCenter.getName(), 
+					"", 
+					STATUS_ASSIGNED));
 		}
 		return Map.of("processed-orders", processedOrdersList);
+	}
+
+	private Map<String, Object> createProcessedOrderMap(Long orderId, Double distance, String centerName, String message, String status) {
+		Map<String, Object> processedOrdersMap = new LinkedHashMap<>();
+		processedOrdersMap.put("distance", distance); 
+		processedOrdersMap.put("orderId", orderId);
+		processedOrdersMap.put("assignedLogisticsCenter", centerName);
+		if(!message.isBlank())
+			processedOrdersMap.put("message", message);
+		processedOrdersMap.put("status", status);			
+		return processedOrdersMap;
 	}
 
 	private void assingAndUpdateOrderAndCenter(Order order, Center assignedCenter) {
