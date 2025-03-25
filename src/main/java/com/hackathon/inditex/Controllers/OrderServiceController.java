@@ -46,6 +46,6 @@ public class OrderServiceController {
 	
 	@PostMapping("/api/orders/order-assignations")
 	public ResponseEntity<?> assignLogisticsCenterToOrders() {
-		return ResponseEntity.ok(orderService.assignLogisticsCenterToOrders());
+		return ResponseEntity.ok(orderService.assignCentersToPendingOrders());
 	}
 }

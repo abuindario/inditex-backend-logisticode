@@ -19,9 +19,11 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-    private final OrderRepository orderRepository;
+    private static final String STATUS_PENDING = "PENDING";
+	private static final String STATUS_ASSIGNED = "ASSIGNED";
+	private static final double EARTH_RADIUS_KM = 6371.0;
+	private final OrderRepository orderRepository;
     private final CenterService centerService;
-    private static final double EARTH_RADIUS_KM = 6371.0;
 
     public OrderServiceImpl(OrderRepository orderRepository, CenterService centerService) {
         this.orderRepository = orderRepository;
@@ -38,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = new Order();
 		order.setCustomerId(orderDto.customerId());
 		order.setSize(orderDto.size().toUpperCase());
-		order.setStatus("PENDING");
+		order.setStatus(STATUS_PENDING);
 		order.setAssignedCenter(null);
 		order.setCoordinates(orderDto.coordinates());
 		return order;
@@ -51,51 +53,51 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
-	public Map<String, List<Map<String, Object>>> assignLogisticsCenterToOrders() {
+	public Map<String, List<Map<String, Object>>> assignCentersToPendingOrders() {
 		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
 
-		List<Order> pendingOrderList = readOrders().stream()
-				.filter(o -> o.getStatus().equals("PENDING"))
+		List<Order> pendingOrders = readOrders().stream()
+				.filter(o -> o.getStatus().equals(STATUS_PENDING))
 				.sorted(Comparator.comparingLong(o -> o.getId()))
 				.collect(Collectors.toCollection(LinkedList::new));
 
-		OUTER: for (Order order : pendingOrderList) {
+		OUTER: for (Order order : pendingOrders) {
 			Map<String, Object> processedOrdersMap = new LinkedHashMap<>();
 			
-			List<Center> centerListFilteredBySize = centerService.readLogisticsCenters().stream()
+			List<Center> centersMatchingOrderSize = centerService.readLogisticsCenters().stream()
 					.filter(c -> c.getCapacity().equals(order.getSize()))
 					.collect(Collectors.toCollection(LinkedList::new));
 			
-			if(centerListFilteredBySize.size() == 0) {
+			if(centersMatchingOrderSize.size() == 0) {
 				processedOrdersMap.put("distance", null); 
 				processedOrdersMap.put("orderId", order.getId());
 				processedOrdersMap.put("assignedLogisticsCenter", null);
 				processedOrdersMap.put("message", "No available centers support the order type.");
-				processedOrdersMap.put("status", "PENDING");
+				processedOrdersMap.put("status", STATUS_PENDING);
 				processedOrdersList.add(processedOrdersMap);
 				continue OUTER;
 			}
 			
-			List<Center> availableCentersFilteredBySize = centerListFilteredBySize.stream()
+			List<Center> availableCentersMatchingOrderSize = centersMatchingOrderSize.stream()
 					.filter(c -> c.getCurrentLoad() < c.getMaxCapacity())
 					.collect(Collectors.toCollection(LinkedList::new));
 			
-			if(availableCentersFilteredBySize.size() == 0) {
+			if(availableCentersMatchingOrderSize.size() == 0) {
 				processedOrdersMap.put("distance", null); 
 				processedOrdersMap.put("orderId", order.getId());
 				processedOrdersMap.put("assignedLogisticsCenter", null);
 				processedOrdersMap.put("message", "All centers are at maximum capacity.");
-				processedOrdersMap.put("status", "PENDING");
+				processedOrdersMap.put("status", STATUS_PENDING);
 				processedOrdersList.add(processedOrdersMap);
 				continue OUTER;
 			}
 			
-			Center assignedCenter = availableCentersFilteredBySize.stream()
+			Center assignedCenter = availableCentersMatchingOrderSize.stream()
 					.min(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
 				    .orElseThrow(() -> new IllegalStateException("No available center found for the order."));
 			
 			order.setAssignedCenter(assignedCenter.getName()); 
-			order.setStatus("ASSIGNED");
+			order.setStatus(STATUS_ASSIGNED);
 
 			assignedCenter.setCurrentLoad( assignedCenter.getCurrentLoad() +1 );
 			  
@@ -105,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
 			processedOrdersMap.put("distance", calculateDistance(assignedCenter.getCoordinates(), order.getCoordinates())); 
 			processedOrdersMap.put("orderId", order.getId());
 			processedOrdersMap.put("assignedLogisticsCenter", assignedCenter.getName());
-			processedOrdersMap.put("status", "ASSIGNED");
+			processedOrdersMap.put("status", STATUS_ASSIGNED);
 			  
 			processedOrdersList.add(processedOrdersMap);
 		}
