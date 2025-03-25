@@ -23,7 +23,11 @@ public class OrderServiceController {
 	@PostMapping("/api/orders")
 	public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderDto) {
 		Order order = orderService.createOrder(orderDto);
-		
+		Map<String, Object> response = populateResponse(order);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+
+	private Map<String, Object> populateResponse(Order order) {
 		Map<String, Object> response = new LinkedHashMap<>();
 		response.put("orderId", order.getId());
 		response.put("customerId", order.getCustomerId());
@@ -32,8 +36,7 @@ public class OrderServiceController {
 		response.put("coordinates", order.getCoordinates());
 		response.put("status", order.getStatus());
 		response.put("message", "Order created successfully in PENDING status.");
-		
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
+		return response;
 	}
 	
 	@GetMapping("/api/orders")
