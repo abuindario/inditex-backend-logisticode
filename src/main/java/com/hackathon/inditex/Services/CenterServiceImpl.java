@@ -52,21 +52,19 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	public boolean existsCenterInCoordinates(Coordinates coordinates) {
 		return readLogisticsCenters().stream()
-			.filter(c -> matchesCoordinates(c, coordinates))
-			.findFirst()
-			.isPresent();
+			.anyMatch(c -> matchesCoordinates(c.getCoordinates(), coordinates));
 	}
 	
 	@Override
 	public boolean duplicatedCenterInCoordinates(Coordinates coordinates) {
 		return readLogisticsCenters().stream()
-				.filter(c -> matchesCoordinates(c, coordinates))
+				.filter(c -> matchesCoordinates(c.getCoordinates(), coordinates))
 				.count() > 1;
 	}
 	
-	private boolean matchesCoordinates(Center center, Coordinates coordinates) {
-		return center.getCoordinates().getLatitude().equals(coordinates.getLatitude()) && 
-		center.getCoordinates().getLongitude().equals(coordinates.getLongitude());
+	private boolean matchesCoordinates(Coordinates a, Coordinates b) {
+		return a.getLatitude().equals(b.getLatitude()) && 
+		a.getLongitude().equals(b.getLongitude());
 	}
 	
 	@Override
