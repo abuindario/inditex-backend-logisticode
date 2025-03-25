@@ -1,11 +1,18 @@
 package com.hackathon.inditex.Services;
 
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hackathon.inditex.DTO.OrderDTO;
+import com.hackathon.inditex.Entities.Center;
+import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Repositories.OrderRepository;
 
@@ -13,30 +20,108 @@ import com.hackathon.inditex.Repositories.OrderRepository;
 public class OrderServiceImpl implements OrderService {
 	@Autowired
 	OrderRepository orderRepository;
-	
+
 	@Override
 	public Order createOrder(OrderDTO orderDto) {
 		Order order = new Order();
 		order.setCustomerId(orderDto.customerId());
-//		if(orderDto.size().equalsIgnoreCase("B") || 
-//				orderDto.size().equalsIgnoreCase("M") ||
-//				orderDto.size().equalsIgnoreCase("S")) {
-			order.setSize(orderDto.size().toUpperCase());
-//		} else {
-//			throw new IllegalArgumentException("Invalid order size, it must be B, M or S.");
-//		}
+		order.setSize(orderDto.size().toUpperCase());
 		order.setStatus("PENDING");
 		order.setAssignedCenter(null);
 		order.setCoordinates(orderDto.coordinates());
-		
+
 		orderRepository.save(order);
-		
+
 		return order;
 	}
 
 	@Override
 	public List<Order> readOrders() {
 		return (List<Order>) orderRepository.findAll();
+	}
+
+	@Autowired
+	CenterService centerService;
+
+	@Override
+	public Map<String, List<Map<String, Object>>> assignLogisticsCenterToOrders() {
+		Map<String, List<Map<String, Object>>> response = new LinkedHashMap<>();
+		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
+
+		List<Order> pendingOrderList = readOrders().stream()
+				.filter(o -> o.getStatus().equals("PENDING"))
+				.sorted(Comparator.comparingLong(o -> o.getId()))
+				.collect(Collectors.toCollection(LinkedList::new));
+
+		List<Center> centerList = centerService.readLogisticsCenters();
+
+		OUTER: for (Order order : pendingOrderList) {
+			Map<String, Object> processedOrdersMap = new LinkedHashMap<>();
+			
+			List<Center> centerListFilteredBySize = centerList.stream()
+				.filter(c -> c.getCapacity().equals(order.getSize()))
+				.collect(Collectors.toCollection(LinkedList::new));
+			
+			if(centerListFilteredBySize.size() == 0) {
+				processedOrdersMap.put("distance", null); 
+				processedOrdersMap.put("orderId", order.getId());
+				processedOrdersMap.put("assignedLogisticsCenter", null);
+				processedOrdersMap.put("message", "No available centers support the order type.");
+				processedOrdersMap.put("status", "PENDING");
+				processedOrdersList.add(processedOrdersMap);
+				continue OUTER;
+			}
+			
+			List<Center> availableCentersFilteredBySize = centerListFilteredBySize.stream()
+					.filter(c -> c.getCurrentLoad() < c.getMaxCapacity())
+					.collect(Collectors.toCollection(LinkedList::new));
+			
+			if(availableCentersFilteredBySize.size() == 0) {
+				processedOrdersMap.put("distance", null); 
+				processedOrdersMap.put("orderId", order.getId());
+				processedOrdersMap.put("assignedLogisticsCenter", null);
+				processedOrdersMap.put("message", "All centers are at maximum capacity.");
+				processedOrdersMap.put("status", "PENDING");
+				processedOrdersList.add(processedOrdersMap);
+				continue OUTER;
+			}
+			
+			Center assignedCenter = availableCentersFilteredBySize.stream()
+				.sorted(Comparator.comparingDouble(c -> calculateDistance(c.getCoordinates(), order.getCoordinates())))
+				.findFirst()
+				.get();
+	
+			order.setAssignedCenter(assignedCenter.getName()); 
+			order.setStatus("ASSIGNED");
+
+			assignedCenter.setCurrentLoad( assignedCenter.getCurrentLoad() +1 );
+			  
+			orderRepository.save(order); 
+			centerService.saveCenter(assignedCenter);
+			  
+			processedOrdersMap.put("distance", calculateDistance(assignedCenter.getCoordinates(), order.getCoordinates())); 
+			processedOrdersMap.put("orderId", order.getId());
+			processedOrdersMap.put("assignedLogisticsCenter", assignedCenter.getName());
+			processedOrdersMap.put("status", "ASSIGNED");
+			  
+			processedOrdersList.add(processedOrdersMap);
+		}
+		response.put("processed-orders", processedOrdersList);
+		return response;
+	}
+
+	private double calculateDistance(Coordinates centerCoordinates, Coordinates orderCoordinates) {
+		double dLat = Math.toRadians((orderCoordinates.getLatitude() - centerCoordinates.getLatitude()));
+		double dLong = Math.toRadians((orderCoordinates.getLongitude() - centerCoordinates.getLongitude()));
+
+		double centerLat = Math.toRadians(centerCoordinates.getLatitude());
+		double orderLat = Math.toRadians(orderCoordinates.getLatitude());
+
+		double a = Math.pow(Math.sin(dLat / 2), 2)
+				+ Math.cos(centerLat) * Math.cos(orderLat) * Math.pow(Math.sin(dLong / 2), 2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+		return 6371 * c;
 	}
 
 }

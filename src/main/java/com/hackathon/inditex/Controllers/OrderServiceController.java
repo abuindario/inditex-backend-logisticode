@@ -40,4 +40,9 @@ public class OrderServiceController {
 	public ResponseEntity<?> readOrders() {
 		return ResponseEntity.ok(orderService.readOrders());
 	}
+	
+	@PostMapping("/api/orders/order-assignations")
+	public ResponseEntity<?> assignLogisticsCenterToOrders() {
+		return ResponseEntity.ok(orderService.assignLogisticsCenterToOrders());
+	}
 }
