@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -61,9 +60,7 @@ public class OrderServiceImpl implements OrderService {
 		OUTER: for (Order order : pendingOrders) {
 			Map<String, Object> processedOrdersMap = new LinkedHashMap<>();
 			
-			List<Center> centersMatchingOrderSize = centerService.readLogisticsCenters().stream()
-					.filter(c -> c.getCapacity().equals(order.getSize()))
-					.collect(Collectors.toCollection(LinkedList::new));
+			List<Center> centersMatchingOrderSize = getCentersMatchingOrderSize(order);
 			
 			if(centersMatchingOrderSize.size() == 0) {
 				processedOrdersMap.put("distance", null); 
@@ -75,9 +72,7 @@ public class OrderServiceImpl implements OrderService {
 				continue OUTER;
 			}
 			
-			List<Center> availableCentersMatchingOrderSize = centersMatchingOrderSize.stream()
-					.filter(c -> c.getCurrentLoad() < c.getMaxCapacity())
-					.collect(Collectors.toCollection(LinkedList::new));
+			List<Center> availableCentersMatchingOrderSize = getAvailableCenters(centersMatchingOrderSize);
 			
 			if(availableCentersMatchingOrderSize.size() == 0) {
 				processedOrdersMap.put("distance", null); 
@@ -111,6 +106,18 @@ public class OrderServiceImpl implements OrderService {
 		Map<String, List<Map<String, Object>>> response = new LinkedHashMap<>();
 		response.put("processed-orders", processedOrdersList);
 		return response;
+	}
+
+	private List<Center> getAvailableCenters(List<Center> centerList) {
+		return centerList.stream()
+				.filter(c -> c.getCurrentLoad() < c.getMaxCapacity())
+				.toList();
+	}
+
+	private List<Center> getCentersMatchingOrderSize(Order order) {
+		return centerService.readLogisticsCenters().stream()
+				.filter(c -> c.getCapacity().equals(order.getSize()))
+				.toList();
 	}
 
 	private List<Order> getPendingOrders() {
