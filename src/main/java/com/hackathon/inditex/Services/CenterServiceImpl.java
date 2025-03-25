@@ -88,9 +88,10 @@ public class CenterServiceImpl implements CenterService {
 		return center;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Center updateCenter(Center center, Map<String, Object> updates) {
+	    updates.forEach((key, value) -> updateCenterField(center, key, value));
+		/*
 		updates.entrySet().forEach(entry -> {
 			if (entry.getValue() != null) {
 				Object updatedValue = entry.getValue();
@@ -129,6 +130,21 @@ public class CenterServiceImpl implements CenterService {
 				}
 			}
 		});
+		*/
 		return center;
+	}
+	
+	private void updateCenterField(Center center, String key, Object value) {
+	    if (value != null) {
+	        switch (key) {
+	            case "name": center.setName(value.toString()); break;
+	            case "capacity": center.setCapacity(value.toString()); break;
+	            case "status": center.setStatus(value.toString()); break;
+	            case "maxCapacity": center.setMaxCapacity(Integer.parseInt(value.toString())); break;
+	            case "currentLoad": center.setCurrentLoad(Integer.parseInt(value.toString())); break;
+	            case "longitude": center.getCoordinates().setLongitude(Double.parseDouble(value.toString())); break;
+	            case "latitude": center.getCoordinates().setLatitude(Double.parseDouble(value.toString())); break;
+	        }
+	    }
 	}
 }
