@@ -1,6 +1,5 @@
 package com.hackathon.inditex.Controllers;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -26,12 +25,12 @@ public class CenterServiceController {
 	CenterService centerService;
 	
 	@PostMapping("/api/centers")
-	public ResponseEntity<Map<String, String>> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
+	public ResponseEntity<ApiResponse> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
 		try {
 			centerService.validateAndSaveLogisticsCenter(centerDto);
-			return new ResponseEntity<>(setResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);			
+			return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Logistics center created successfully."));
 		} catch(IllegalArgumentException e) {
-			return new ResponseEntity<>(setResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage()));
 		}
 	}
 	
@@ -41,28 +40,23 @@ public class CenterServiceController {
 	}
 	
 	@DeleteMapping("/api/centers/{id}")
-	public ResponseEntity<Map<String, String>> deleteLogisticsCenterById(@PathVariable("id") int id) {
+	public ResponseEntity<ApiResponse> deleteLogisticsCenterById(@PathVariable("id") int id) {
 		centerService.deleteLogisticsCenterById(id);
-		return ResponseEntity.ok(setResponseMessage("Logistics center deleted successfully."));
+		return ResponseEntity.ok(new ApiResponse("Logistics center deleted successfully."));
 	}
 	
 	@PatchMapping("/api/centers/{id}")
-	public ResponseEntity<Map<String, String>> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
+	public ResponseEntity<ApiResponse> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
 		try {
 			Center center = centerService.findCenterById(id).orElseThrow(() -> new NoSuchElementException("Center not found."));
 			centerService.updateAndSaveCenter(center , updates);
-			return ResponseEntity.ok(setResponseMessage("Logistics center updated successfully."));
+			return ResponseEntity.ok(new ApiResponse("Logistics center updated successfully."));
 		} catch(NoSuchElementException e) {
-			return new ResponseEntity<>(setResponseMessage(e.getMessage()), HttpStatus.NOT_FOUND);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage()));
 		} catch(IllegalArgumentException e) {
-			return new ResponseEntity<>(setResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage()));
 		}
 	}
-	
-	public static Map<String, String> setResponseMessage (String message) {
-		Map<String, String> response = new HashMap<>();
-		response.put("message", message);
-		return response;
-	}
-	
 }
+
+record ApiResponse(String message) {}
