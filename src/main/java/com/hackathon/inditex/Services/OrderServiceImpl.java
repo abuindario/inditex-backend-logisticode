@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Order> readOrders() {
-		return (List<Order>) orderRepository.findAll();
+		return List.copyOf((List<Order>) orderRepository.findAll());
 	}
 
 	@Override

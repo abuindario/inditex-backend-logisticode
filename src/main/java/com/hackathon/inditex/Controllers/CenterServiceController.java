@@ -49,7 +49,7 @@ public class CenterServiceController {
 	public ResponseEntity<ApiResponse> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
 		try {
 			Center center = centerService.findCenterById(id).orElseThrow(() -> new NoSuchElementException("Center not found."));
-			centerService.updateAndSaveCenter(center , updates);
+			centerService.updateAndSaveCenter(center, updates);
 			return ResponseEntity.ok(new ApiResponse("Logistics center updated successfully."));
 		} catch(NoSuchElementException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage()));
