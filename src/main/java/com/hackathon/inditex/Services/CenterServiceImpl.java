@@ -5,13 +5,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hackathon.inditex.DTO.CenterDTO;
 import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Repositories.CenterRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class CenterServiceImpl implements CenterService {
@@ -32,6 +31,7 @@ public class CenterServiceImpl implements CenterService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Center> readLogisticsCenters() {
 		return (List<Center>) centerRepository.findAll();
 	}
@@ -49,6 +49,7 @@ public class CenterServiceImpl implements CenterService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public Optional<Center> findCenterById(int id) {
 		return centerRepository.findById(Long.valueOf(id));
 	}

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hackathon.inditex.DTO.OrderDTO;
 import com.hackathon.inditex.Entities.Center;
@@ -14,10 +15,9 @@ import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Repositories.OrderRepository;
 
-import jakarta.transaction.Transactional;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public final class OrderServiceImpl implements OrderService {
 	private static final String NO_AVAILABLE_CENTER_FOUND_FOR_THE_ORDER = "No available center found for the order.";
 	private static final String ALL_CENTERS_ARE_AT_MAXIMUM_CAPACITY = "All centers are at maximum capacity.";
 	private static final String NO_AVAILABLE_CENTERS_SUPPORT_THE_ORDER_TYPE = "No available centers support the order type.";
@@ -49,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Order> readOrders() {
 		return (List<Order>) orderRepository.findAll();
 	}
@@ -57,34 +58,38 @@ public class OrderServiceImpl implements OrderService {
 	@Transactional
 	public Map<String, List<Map<String, Object>>> assignCentersToPendingOrders() {
 		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
+		
 		for (Order order : getPendingOrders()) {
 			List<Center> centersMatchingOrderSize = getCentersMatchingOrderSize(order);
-			if (isEmpty(centersMatchingOrderSize)) {
+			
+			if (centersMatchingOrderSize.isEmpty()) {
 				addToProcessedOrderList(processedOrdersList, null, order.getId(), null,
 						NO_AVAILABLE_CENTERS_SUPPORT_THE_ORDER_TYPE, STATUS_PENDING);
 				continue;
 			}
+			
 			List<Center> availableCentersMatchingOrderSize = getAvailableCenters(centersMatchingOrderSize);
-			if (isEmpty(availableCentersMatchingOrderSize)) {
+			
+			if (availableCentersMatchingOrderSize.isEmpty()) {
 				addToProcessedOrderList(processedOrdersList, null, order.getId(), null,
 						ALL_CENTERS_ARE_AT_MAXIMUM_CAPACITY, STATUS_PENDING);
 				continue;
 			}
+			
 			Map.Entry<Center, Double> assignedCenterAndDistance = availableCentersMatchingOrderSize.stream()
 				    .map(center -> Map.entry(center, calculateDistance(center.getCoordinates(), order.getCoordinates())))
 				    .min(Comparator.comparingDouble(Map.Entry::getValue))
 				    .orElseThrow(() -> new IllegalStateException(NO_AVAILABLE_CENTER_FOUND_FOR_THE_ORDER));
+			
 			Center assignedCenter = assignedCenterAndDistance.getKey();
+			
 			assignAndUpdateOrderAndCenter(order, assignedCenter);
+			
 			addToProcessedOrderList(processedOrdersList,
 					assignedCenterAndDistance.getValue(), order.getId(),
 					assignedCenter.getName(), "", STATUS_ASSIGNED);
 		}
 		return Map.of("processed-orders", processedOrdersList);
-	}
-
-	private boolean isEmpty(List<Center> centersMatchingOrderSize) {
-		return centersMatchingOrderSize.isEmpty();
 	}
 
 	private void addToProcessedOrderList(List<Map<String, Object>> processedOrdersList, Double distance, Long orderId,
@@ -107,25 +112,30 @@ public class OrderServiceImpl implements OrderService {
 	private void assignAndUpdateOrderAndCenter(Order order, Center assignedCenter) {
 		order.setAssignedCenter(assignedCenter.getName());
 		order.setStatus(STATUS_ASSIGNED);
-
 		assignedCenter.setCurrentLoad(assignedCenter.getCurrentLoad() + 1);
-
+		
 		orderRepository.save(order);
 		centerService.saveCenter(assignedCenter);
 	}
 
 	private List<Center> getAvailableCenters(List<Center> centerList) {
-		return centerList.stream().filter(c -> c.getCurrentLoad() < c.getMaxCapacity()).toList();
+		return centerList.stream()
+							.filter(c -> c.getCurrentLoad() < c.getMaxCapacity())
+							.toList();
 	}
 
 	private List<Center> getCentersMatchingOrderSize(Order order) {
-		return centerService.readLogisticsCenters().stream().filter(c -> c.getCapacity().equals(order.getSize()))
-				.toList();
+		return centerService.readLogisticsCenters()
+								.stream()
+								.filter(c -> c.getCapacity().equals(order.getSize()))
+								.toList();
 	}
 
 	private List<Order> getPendingOrders() {
-		return readOrders().stream().filter(o -> o.getStatus().equals(STATUS_PENDING))
-				.sorted(Comparator.comparingLong(o -> o.getId())).toList();
+		return readOrders().stream()
+							.filter(o -> o.getStatus().equals(STATUS_PENDING))
+							.sorted(Comparator.comparingLong(o -> o.getId()))
+							.toList();
 	}
 
 	private double calculateDistance(Coordinates centerCoordinates, Coordinates orderCoordinates) {
