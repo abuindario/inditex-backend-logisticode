@@ -3,7 +3,7 @@ package com.hackathon.inditex.Controllers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,26 +48,16 @@ public class CenterServiceController {
 	
 	@PatchMapping("/api/centers/{id}")
 	public ResponseEntity<Map<String, String>> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
-		Optional<Center> centerOpt = centerService.findCenterById(id);
-		if(centerOpt.isEmpty()) {
-			return new ResponseEntity<>(setResponseMessage("Center not found."), HttpStatus.NOT_FOUND);			
+		try {
+			Center center = centerService.findCenterById(id).orElseThrow(() -> new NoSuchElementException("Center not found."));
+			center = centerService.updateCenter(center , updates);
+			centerService.saveCenter(center);
+			return ResponseEntity.ok(setResponseMessage("Logistics center updated successfully."));
+		} catch(NoSuchElementException e) {
+			return new ResponseEntity<>(setResponseMessage(e.getMessage()), HttpStatus.NOT_FOUND);
+		} catch(IllegalArgumentException e) {
+			return new ResponseEntity<>(setResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		Center center = centerService.updateCenter(centerOpt.get(), updates);
-		
-		if(updates.containsKey("coordinates") || updates.containsKey("latitude") || updates.containsKey("longitude")) {
-			if(centerService.duplicatedCenterInCoordinates(center.getCoordinates())) {
-				return new ResponseEntity<>(setResponseMessage("There is already a logistics center in that position."), HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		}
-		
-		if(centerService.exceedsMaxCapacity(center.getCurrentLoad(), center.getMaxCapacity())) {
-			return new ResponseEntity<>(setResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);		
-		}
-		
-		centerService.saveCenter(center);
-		
-		return ResponseEntity.ok(setResponseMessage("Logistics center updated successfully."));
 	}
 	
 	public static Map<String, String> setResponseMessage (String message) {

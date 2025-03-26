@@ -21,11 +21,6 @@ public class CenterServiceImpl implements CenterService {
 	}
 
 	@Override
-	public boolean exceedsMaxCapacity(int currentLoad, int maxCapacity) {
-		return currentLoad > maxCapacity;
-	}
-
-	@Override
 	@Transactional(readOnly = true)
 	public List<Center> readLogisticsCenters() {
 		return (List<Center>) centerRepository.findAll();
@@ -49,7 +44,6 @@ public class CenterServiceImpl implements CenterService {
 		return centerRepository.findById(Long.valueOf(id));
 	}
 	
-	@Override
 	public boolean duplicatedCenterInCoordinates(Coordinates coordinates) {
 		return readLogisticsCenters().stream()
 				.filter(c -> matchesCoordinates(c.getCoordinates(), coordinates))
@@ -63,7 +57,7 @@ public class CenterServiceImpl implements CenterService {
 	
 	@Override
 	public Center validateAndCreateLogisticsCenter(CenterDTO centerDto) {
-		validateCenter(centerDto);
+		validateCenterDto(centerDto);
 		return createLogisticsCenter(centerDto);
 	}
 
@@ -72,7 +66,7 @@ public class CenterServiceImpl implements CenterService {
 		return centerRepository.save(mapCenterDtoToCenter(centerDto));
 	}
 
-	private void validateCenter(CenterDTO centerDto) {
+	private void validateCenterDto(CenterDTO centerDto) {
 		if(existsCenterInCoordinates(centerDto)) {
 			throw new IllegalArgumentException("There is already a logistics center in that position.");
 		}
@@ -101,7 +95,15 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	public Center updateCenter(Center center, Map<String, Object> updates) {
 	    updates.forEach((key, value) -> updateCenterField(center, key, value));
+	    validateCenter(center);
 		return center;
+	}
+
+	private void validateCenter(Center center) {
+		if(duplicatedCenterInCoordinates(center.getCoordinates())) 
+	    	throw new IllegalArgumentException("There is already a logistics center in that position.");
+	    if(center.getCurrentLoad() > center.getMaxCapacity())
+	    	throw new IllegalArgumentException("Current load cannot exceed max capacity.");
 	}
 	
 	private void updateCenterField(Center center, String key, Object value) {
