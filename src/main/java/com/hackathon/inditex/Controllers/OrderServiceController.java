@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hackathon.inditex.DTO.OrderDTO;
+import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Services.OrderService;
 
@@ -21,10 +22,20 @@ public class OrderServiceController {
 	OrderService orderService;
 
 	@PostMapping("/api/orders")
-	public ResponseEntity<Order> createOrder(@RequestBody OrderDTO orderDto) {
-//		Order order = orderService.createOrder(orderDto);
+	public ResponseEntity<OrderApiResponse> createOrder(@RequestBody OrderDTO orderDto) {
+		Order order = orderService.createOrder(orderDto);
+		
 //		Map<String, Object> response = populateResponse(order);
-		return new ResponseEntity<>(orderService.createOrder(orderDto), HttpStatus.CREATED);
+		return ResponseEntity.status(HttpStatus.CREATED).body(
+				new OrderApiResponse(
+					order.getId(), 
+					order.getCustomerId(), 
+					order.getSize(),
+					order.getAssignedCenter(),
+					order.getCoordinates(),
+					order.getStatus(),
+					"Order created successfully in PENDING status."
+				));
 	}
 
 //	private Map<String, Object> populateResponse(Order order) {
@@ -49,3 +60,6 @@ public class OrderServiceController {
 		return ResponseEntity.ok(orderService.assignCentersToPendingOrders());
 	}
 }
+
+record OrderApiResponse (Long id, Long customerId, String size, String assignedCenter, Coordinates coordinates, String status,
+		String message) {}
