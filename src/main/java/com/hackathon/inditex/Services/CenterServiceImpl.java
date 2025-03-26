@@ -13,21 +13,16 @@ import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Repositories.CenterRepository;
 
 @Service
-public class CenterServiceImpl implements CenterService {
-	private CenterRepository centerRepository;
+public final class CenterServiceImpl implements CenterService {
+	private final CenterRepository centerRepository;
 	
 	public CenterServiceImpl(CenterRepository centerRepository) {
 		this.centerRepository = centerRepository;
 	}
 
 	@Override
-	public boolean exceedsMaxCapacity(CenterDTO centerDto) {
-		return centerDto.currentLoad() > centerDto.maxCapacity();
-	}
-	
-	@Override
-	public boolean exceedsMaxCapacity(Center center) {
-		return center.getCurrentLoad() > center.getMaxCapacity();
+	public boolean exceedsMaxCapacity(int currentLoad, int maxCapacity) {
+		return currentLoad > maxCapacity;
 	}
 
 	@Override

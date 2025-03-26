@@ -14,8 +14,6 @@ public interface CenterService {
 
 	boolean existsCenterInCoordinates(Coordinates coordiantes);
 
-	boolean exceedsMaxCapacity(CenterDTO centerDto);
-
 	List<Center> readLogisticsCenters();
 
 	void deleteLogisticsCenterById(int id);
@@ -24,7 +22,7 @@ public interface CenterService {
 
 	Optional<Center> findCenterById(int id);
 
-	boolean exceedsMaxCapacity(Center center);
+	public boolean exceedsMaxCapacity(int currentLoad, int maxCapacity);
 	
 	void saveCenter(Center center);
 

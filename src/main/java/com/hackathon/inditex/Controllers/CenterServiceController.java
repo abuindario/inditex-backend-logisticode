@@ -31,7 +31,7 @@ public class CenterServiceController {
 			return new ResponseEntity<>(setResponseMessage("There is already a logistics center in that position."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		if(centerService.exceedsMaxCapacity(centerDto)) {
+		if(centerService.exceedsMaxCapacity(centerDto.currentLoad(), centerDto.maxCapacity())) {
 			return new ResponseEntity<>(setResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -66,7 +66,7 @@ public class CenterServiceController {
 			}
 		}
 		
-		if(centerService.exceedsMaxCapacity(center)) {
+		if(centerService.exceedsMaxCapacity(center.getCurrentLoad(), center.getMaxCapacity())) {
 			return new ResponseEntity<>(setResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);		
 		}
 		
