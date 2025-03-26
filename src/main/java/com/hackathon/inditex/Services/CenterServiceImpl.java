@@ -23,7 +23,7 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Center> readLogisticsCenters() {
-		return (List<Center>) centerRepository.findAll();
+		return List.copyOf((List<Center>) centerRepository.findAll());
 	}
 
 	@Override
@@ -56,14 +56,14 @@ public class CenterServiceImpl implements CenterService {
 	}
 	
 	@Override
-	public Center validateAndCreateLogisticsCenter(CenterDTO centerDto) {
+	public void validateAndCreateLogisticsCenter(CenterDTO centerDto) {
 		validateCenterDto(centerDto);
-		return createLogisticsCenter(centerDto);
+		createLogisticsCenter(centerDto);
 	}
 
 	@Transactional
-	private Center createLogisticsCenter(CenterDTO centerDto) {
-		return centerRepository.save(mapCenterDtoToCenter(centerDto));
+	private void createLogisticsCenter(CenterDTO centerDto) {
+		centerRepository.save(mapCenterDtoToCenter(centerDto));
 	}
 
 	private void validateCenterDto(CenterDTO centerDto) {

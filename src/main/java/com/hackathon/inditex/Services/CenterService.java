@@ -9,7 +9,7 @@ import com.hackathon.inditex.Entities.Center;
 
 public interface CenterService {
 
-	Center validateAndCreateLogisticsCenter(CenterDTO centerDto);
+	void validateAndCreateLogisticsCenter(CenterDTO centerDto);
 
 	List<Center> readLogisticsCenters();
 
