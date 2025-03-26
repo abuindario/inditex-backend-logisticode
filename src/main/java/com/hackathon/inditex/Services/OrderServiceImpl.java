@@ -1,8 +1,6 @@
 package com.hackathon.inditex.Services;
 
 import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hackathon.inditex.DTO.OrderDTO;
+import com.hackathon.inditex.DTO.ProcessedOrdersDTO;
 import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Entities.Order;
@@ -53,17 +52,16 @@ public class OrderServiceImpl implements OrderService {
 	public List<Order> readOrders() {
 		return List.copyOf((List<Order>) orderRepository.findAll());
 	}
-
+	
 	@Override
 	@Transactional
-	public Map<String, Object> assignCentersToPendingOrders() {
-		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
-		
+	public ProcessedOrdersDTO assignCentersToPendingOrders() {
+		ProcessedOrdersDTO processedOrdersDTO = new ProcessedOrdersDTO();
 		for (Order order : getPendingOrders()) {
 			List<Center> centersMatchingOrderSize = getCentersMatchingOrderSize(order);
 			
 			if (centersMatchingOrderSize.isEmpty()) {
-				addToProcessedOrderList(processedOrdersList, null, order.getId(), null,
+				processedOrdersDTO.processOrder(null, order.getId(), null,
 						NO_AVAILABLE_CENTERS_SUPPORT_THE_ORDER_TYPE, STATUS_PENDING);
 				continue;
 			}
@@ -71,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
 			List<Center> availableCentersMatchingOrderSize = getAvailableCenters(centersMatchingOrderSize);
 			
 			if (availableCentersMatchingOrderSize.isEmpty()) {
-				addToProcessedOrderList(processedOrdersList, null, order.getId(), null,
+				processedOrdersDTO.processOrder(null, order.getId(), null,
 						ALL_CENTERS_ARE_AT_MAXIMUM_CAPACITY, STATUS_PENDING);
 				continue;
 			}
@@ -82,31 +80,14 @@ public class OrderServiceImpl implements OrderService {
 				    .orElseThrow(() -> new IllegalStateException(NO_AVAILABLE_CENTER_FOUND_FOR_THE_ORDER));
 			
 			Center assignedCenter = assignedCenterAndDistance.getKey();
+			double distance = assignedCenterAndDistance.getValue();
 			
 			assignAndUpdateOrderAndCenter(order, assignedCenter);
 			
-			addToProcessedOrderList(processedOrdersList,
-					assignedCenterAndDistance.getValue(), order.getId(),
+			processedOrdersDTO.processOrder(distance, order.getId(),
 					assignedCenter.getName(), "", STATUS_ASSIGNED);
 		}
-		return Map.of("processed-orders", processedOrdersList);
-	}
-
-	private void addToProcessedOrderList(List<Map<String, Object>> processedOrdersList, Double distance, Long orderId,
-			String centerName, String message, String status) {
-		processedOrdersList.add(createProcessedOrderMap(distance, orderId, centerName, message, status));
-	}
-
-	private Map<String, Object> createProcessedOrderMap(Double distance, Long orderId, String centerName,
-			String message, String status) {
-		Map<String, Object> processedOrdersMap = new LinkedHashMap<>();
-		processedOrdersMap.put("distance", distance);
-		processedOrdersMap.put("orderId", orderId);
-		processedOrdersMap.put("assignedLogisticsCenter", centerName);
-		if (!message.isBlank())
-			processedOrdersMap.put("message", message);
-		processedOrdersMap.put("status", status);
-		return processedOrdersMap;
+		return processedOrdersDTO;
 	}
 
 	private void assignAndUpdateOrderAndCenter(Order order, Center assignedCenter) {

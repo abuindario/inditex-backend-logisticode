@@ -1,7 +1,6 @@
 package com.hackathon.inditex.Controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hackathon.inditex.DTO.OrderDTO;
+import com.hackathon.inditex.DTO.ProcessedOrdersDTO;
 import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Entities.Order;
 import com.hackathon.inditex.Services.OrderService;
@@ -36,7 +36,7 @@ public class OrderServiceController {
 	}
 	
 	@PostMapping("/api/orders/order-assignations")
-	public ResponseEntity<Map<String, Object>> assignLogisticsCenterToOrders() {
+	public ResponseEntity<ProcessedOrdersDTO> assignLogisticsCenterToOrders() {
 		return ResponseEntity.ok(orderService.assignCentersToPendingOrders());
 	}
 }
