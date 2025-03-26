@@ -24,31 +24,11 @@ public class OrderServiceController {
 	@PostMapping("/api/orders")
 	public ResponseEntity<OrderApiResponse> createOrder(@RequestBody OrderDTO orderDto) {
 		Order order = orderService.createOrder(orderDto);
-		
-//		Map<String, Object> response = populateResponse(order);
-		return ResponseEntity.status(HttpStatus.CREATED).body(
-				new OrderApiResponse(
-					order.getId(), 
-					order.getCustomerId(), 
-					order.getSize(),
-					order.getAssignedCenter(),
-					order.getCoordinates(),
-					order.getStatus(),
-					"Order created successfully in PENDING status."
-				));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(new OrderApiResponse(order.getId(), order.getCustomerId(), order.getSize(),
+						order.getAssignedCenter(), order.getCoordinates(), order.getStatus(),
+						"Order created successfully in PENDING status."));
 	}
-
-//	private Map<String, Object> populateResponse(Order order) {
-//		Map<String, Object> response = new LinkedHashMap<>();
-//		response.put("orderId", order.getId());
-//		response.put("customerId", order.getCustomerId());
-//		response.put("size", order.getSize());
-//		response.put("assignedLogisticsCenter", order.getAssignedCenter());
-//		response.put("coordinates", order.getCoordinates());
-//		response.put("status", order.getStatus());
-//		response.put("message", "Order created successfully in PENDING status.");
-//		return response;
-//	}
 	
 	@GetMapping("/api/orders")
 	public ResponseEntity<List<Order>> readOrders() {

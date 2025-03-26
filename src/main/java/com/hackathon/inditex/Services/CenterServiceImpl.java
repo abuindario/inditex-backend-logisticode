@@ -33,12 +33,6 @@ public class CenterServiceImpl implements CenterService {
 	}
 	
 	@Override
-	@Transactional
-	public void saveCenter(Center center) {
-		centerRepository.save(center);
-	}
-	
-	@Override
 	@Transactional(readOnly = true)
 	public Optional<Center> findCenterById(int id) {
 		return centerRepository.findById(Long.valueOf(id));
@@ -54,7 +48,13 @@ public class CenterServiceImpl implements CenterService {
 	    updates.forEach((key, value) -> updateCenterField(center, key, value));
 	    validateAndSaveCenter(center);
 	}
-
+	
+	@Override
+	@Transactional
+	public void saveCenter(Center center) {
+		centerRepository.save(center);
+	}
+	
 	private void validateAndSaveCenter(Center center) {
 		validateCenter(center);
 		saveCenter(center);
