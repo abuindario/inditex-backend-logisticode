@@ -28,7 +28,7 @@ public class CenterServiceController {
 	@PostMapping("/api/centers")
 	public ResponseEntity<Map<String, String>> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
 		try {
-			centerService.validateAndCreateLogisticsCenter(centerDto);
+			centerService.validateAndSaveLogisticsCenter(centerDto);
 			return new ResponseEntity<>(setResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);			
 		} catch(IllegalArgumentException e) {
 			return new ResponseEntity<>(setResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -50,8 +50,7 @@ public class CenterServiceController {
 	public ResponseEntity<Map<String, String>> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
 		try {
 			Center center = centerService.findCenterById(id).orElseThrow(() -> new NoSuchElementException("Center not found."));
-			center = centerService.updateCenter(center , updates);
-			centerService.saveCenter(center);
+			centerService.updateAndSaveCenter(center , updates);
 			return ResponseEntity.ok(setResponseMessage("Logistics center updated successfully."));
 		} catch(NoSuchElementException e) {
 			return new ResponseEntity<>(setResponseMessage(e.getMessage()), HttpStatus.NOT_FOUND);

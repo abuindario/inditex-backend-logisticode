@@ -44,36 +44,38 @@ public class CenterServiceImpl implements CenterService {
 		return centerRepository.findById(Long.valueOf(id));
 	}
 	
-	public boolean duplicatedCenterInCoordinates(Coordinates coordinates) {
+	@Override
+	public void validateAndSaveLogisticsCenter(CenterDTO centerDto) {
+		validateAndSaveCenter(mapCenterDtoToCenter(centerDto));
+	}
+	
+	@Override
+	public void updateAndSaveCenter(Center center, Map<String, Object> updates) {
+	    updates.forEach((key, value) -> updateCenterField(center, key, value));
+	    validateAndSaveCenter(center);
+	}
+
+	private void validateAndSaveCenter(Center center) {
+		validateCenter(center);
+		saveCenter(center);
+	}
+	
+	private void validateCenter(Center center) {
+		if(duplicatedCenterInCoordinates(center))
+	    	throw new IllegalArgumentException("There is already a logistics center in that position.");
+	    if(center.getCurrentLoad() > center.getMaxCapacity())
+	    	throw new IllegalArgumentException("Current load cannot exceed max capacity.");
+	}
+	
+	public boolean duplicatedCenterInCoordinates(Center center) {
 		return readLogisticsCenters().stream()
-				.filter(c -> matchesCoordinates(c.getCoordinates(), coordinates))
-				.count() > 1;
+				.filter(c -> c.getId() != center.getId())
+				.anyMatch(c -> matchesCoordinates(c.getCoordinates(), center.getCoordinates()));
 	}
 	
 	private boolean matchesCoordinates(Coordinates a, Coordinates b) {
 		return a.getLatitude().equals(b.getLatitude()) && 
 		a.getLongitude().equals(b.getLongitude());
-	}
-	
-	@Override
-	public void validateAndCreateLogisticsCenter(CenterDTO centerDto) {
-		validateCenterDto(centerDto);
-		saveCenter(mapCenterDtoToCenter(centerDto));
-	}
-
-	private void validateCenterDto(CenterDTO centerDto) {
-		if(existsCenterInCoordinates(centerDto)) {
-			throw new IllegalArgumentException("There is already a logistics center in that position.");
-		}
-			
-		if(centerDto.currentLoad() > centerDto.maxCapacity()) {
-			throw new IllegalArgumentException("Current load cannot exceed max capacity.");
-		}
-	}
-
-	private boolean existsCenterInCoordinates(CenterDTO centerDto) {
-		return readLogisticsCenters().stream()
-				.anyMatch(c -> matchesCoordinates(c.getCoordinates(), centerDto.coordinates()));
 	}
 
 	private Center mapCenterDtoToCenter(CenterDTO centerDto) {
@@ -85,20 +87,6 @@ public class CenterServiceImpl implements CenterService {
 		center.setMaxCapacity(centerDto.maxCapacity());
 		center.setCoordinates(centerDto.coordinates());
 		return center;
-	}
-
-	@Override
-	public Center updateCenter(Center center, Map<String, Object> updates) {
-	    updates.forEach((key, value) -> updateCenterField(center, key, value));
-	    validateCenter(center);
-		return center;
-	}
-
-	private void validateCenter(Center center) {
-		if(duplicatedCenterInCoordinates(center.getCoordinates())) 
-	    	throw new IllegalArgumentException("There is already a logistics center in that position.");
-	    if(center.getCurrentLoad() > center.getMaxCapacity())
-	    	throw new IllegalArgumentException("Current load cannot exceed max capacity.");
 	}
 	
 	private void updateCenterField(Center center, String key, Object value) {

@@ -9,13 +9,12 @@ import com.hackathon.inditex.Entities.Center;
 
 public interface CenterService {
 
-	void validateAndCreateLogisticsCenter(CenterDTO centerDto);
+	void validateAndSaveLogisticsCenter(CenterDTO centerDto);
+	void updateAndSaveCenter(Center center, Map<String, Object> updates);
 
 	List<Center> readLogisticsCenters();
 
 	void deleteLogisticsCenterById(int id);
-
-	Center updateCenter(Center center, Map<String, Object> updates);
 
 	Optional<Center> findCenterById(int id);
 	
