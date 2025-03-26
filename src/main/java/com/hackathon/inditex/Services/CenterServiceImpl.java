@@ -50,12 +50,6 @@ public final class CenterServiceImpl implements CenterService {
 	}
 	
 	@Override
-	public boolean existsCenterInCoordinates(Coordinates coordinates) {
-		return readLogisticsCenters().stream()
-			.anyMatch(c -> matchesCoordinates(c.getCoordinates(), coordinates));
-	}
-	
-	@Override
 	public boolean duplicatedCenterInCoordinates(Coordinates coordinates) {
 		return readLogisticsCenters().stream()
 				.filter(c -> matchesCoordinates(c.getCoordinates(), coordinates))
@@ -68,9 +62,29 @@ public final class CenterServiceImpl implements CenterService {
 	}
 	
 	@Override
+	public Center validateAndCreateLogisticsCenter(CenterDTO centerDto) {
+		validateCenter(centerDto);
+		return createLogisticsCenter(centerDto);
+	}
+
 	@Transactional
-	public Center createLogisticsCenter(CenterDTO centerDto) {
+	private Center createLogisticsCenter(CenterDTO centerDto) {
 		return centerRepository.save(mapCenterDtoToCenter(centerDto));
+	}
+
+	private void validateCenter(CenterDTO centerDto) {
+		if(existsCenterInCoordinates(centerDto)) {
+			throw new IllegalArgumentException("There is already a logistics center in that position.");
+		}
+			
+		if(centerDto.currentLoad() > centerDto.maxCapacity()) {
+			throw new IllegalArgumentException("Current load cannot exceed max capacity.");
+		}
+	}
+
+	private boolean existsCenterInCoordinates(CenterDTO centerDto) {
+		return readLogisticsCenters().stream()
+				.anyMatch(c -> matchesCoordinates(c.getCoordinates(), centerDto.coordinates()));
 	}
 
 	private Center mapCenterDtoToCenter(CenterDTO centerDto) {

@@ -27,17 +27,12 @@ public class CenterServiceController {
 	
 	@PostMapping("/api/centers")
 	public ResponseEntity<Map<String, String>> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
-		if(centerService.existsCenterInCoordinates(centerDto.coordinates())) {
-			return new ResponseEntity<>(setResponseMessage("There is already a logistics center in that position."), HttpStatus.INTERNAL_SERVER_ERROR);
+		try {
+			centerService.validateAndCreateLogisticsCenter(centerDto);
+			return new ResponseEntity<>(setResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);			
+		} catch(IllegalArgumentException e) {
+			return new ResponseEntity<>(setResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		if(centerService.exceedsMaxCapacity(centerDto.currentLoad(), centerDto.maxCapacity())) {
-			return new ResponseEntity<>(setResponseMessage("Current load cannot exceed max capacity."), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-		centerService.createLogisticsCenter(centerDto);
-		
-		return new ResponseEntity<>(setResponseMessage("Logistics center created successfully."), HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/api/centers")

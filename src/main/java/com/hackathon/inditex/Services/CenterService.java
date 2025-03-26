@@ -10,9 +10,7 @@ import com.hackathon.inditex.Entities.Coordinates;
 
 public interface CenterService {
 
-	Center createLogisticsCenter(CenterDTO centerDto);
-
-	boolean existsCenterInCoordinates(Coordinates coordiantes);
+	Center validateAndCreateLogisticsCenter(CenterDTO centerDto);
 
 	List<Center> readLogisticsCenters();
 
