@@ -12,6 +12,6 @@ public interface OrderService {
 
 	List<Order> readOrders();
 
-	Map<String, List<Map<String, Object>>> assignCentersToPendingOrders();
+	Map<String, Object> assignCentersToPendingOrders();
 
 }

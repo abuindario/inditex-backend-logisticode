@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
-	public Map<String, List<Map<String, Object>>> assignCentersToPendingOrders() {
+	public Map<String, Object> assignCentersToPendingOrders() {
 		List<Map<String, Object>> processedOrdersList = new LinkedList<>();
 		
 		for (Order order : getPendingOrders()) {

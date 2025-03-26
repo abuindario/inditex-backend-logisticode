@@ -36,7 +36,7 @@ public class OrderServiceController {
 	}
 	
 	@PostMapping("/api/orders/order-assignations")
-	public ResponseEntity<Map<String, List<Map<String, Object>>>> assignLogisticsCenterToOrders() {
+	public ResponseEntity<Map<String, Object>> assignLogisticsCenterToOrders() {
 		return ResponseEntity.ok(orderService.assignCentersToPendingOrders());
 	}
 }
