@@ -17,7 +17,7 @@ import com.hackathon.inditex.Repositories.OrderRepository;
 
 
 @Service
-public final class OrderServiceImpl implements OrderService {
+public class OrderServiceImpl implements OrderService {
 	private static final String NO_AVAILABLE_CENTER_FOUND_FOR_THE_ORDER = "No available center found for the order.";
 	private static final String ALL_CENTERS_ARE_AT_MAXIMUM_CAPACITY = "All centers are at maximum capacity.";
 	private static final String NO_AVAILABLE_CENTERS_SUPPORT_THE_ORDER_TYPE = "No available centers support the order type.";

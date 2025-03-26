@@ -13,7 +13,7 @@ import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Repositories.CenterRepository;
 
 @Service
-public final class CenterServiceImpl implements CenterService {
+public class CenterServiceImpl implements CenterService {
 	private final CenterRepository centerRepository;
 	
 	public CenterServiceImpl(CenterRepository centerRepository) {
