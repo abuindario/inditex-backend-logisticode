@@ -58,12 +58,7 @@ public class CenterServiceImpl implements CenterService {
 	@Override
 	public void validateAndCreateLogisticsCenter(CenterDTO centerDto) {
 		validateCenterDto(centerDto);
-		createLogisticsCenter(centerDto);
-	}
-
-	@Transactional
-	private void createLogisticsCenter(CenterDTO centerDto) {
-		centerRepository.save(mapCenterDtoToCenter(centerDto));
+		saveCenter(mapCenterDtoToCenter(centerDto));
 	}
 
 	private void validateCenterDto(CenterDTO centerDto) {
