@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hackathon.inditex.DTO.OrderDTO;
+import com.hackathon.inditex.DTO.OrderOutputDTO;
 import com.hackathon.inditex.DTO.ProcessedOrdersDTO;
 import com.hackathon.inditex.Entities.Coordinates;
 import com.hackathon.inditex.Entities.Order;
@@ -33,7 +34,7 @@ public class OrderServiceController {
 	}
 	
 	@GetMapping("/api/orders")
-	public ResponseEntity<List<Order>> readOrders() {
+	public ResponseEntity<List<OrderOutputDTO>> readOrders() {
 		return ResponseEntity.ok(orderService.readOrders());
 	}
 	

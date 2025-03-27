@@ -1,6 +1,7 @@
 package com.hackathon.inditex.Services;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hackathon.inditex.DTO.OrderDTO;
+import com.hackathon.inditex.DTO.OrderOutputDTO;
 import com.hackathon.inditex.DTO.ProcessedOrdersDTO;
 import com.hackathon.inditex.Entities.Center;
 import com.hackathon.inditex.Entities.Coordinates;
@@ -47,10 +49,20 @@ public class OrderServiceImpl implements OrderService {
 		return order;
 	}
 
+//	@Override
+//	@Transactional(readOnly = true)
+//	public List<Order> readOrders() {
+//		return List.copyOf((List<Order>) orderRepository.findAll());
+//	}
+	
 	@Override
 	@Transactional(readOnly = true)
-	public List<Order> readOrders() {
-		return List.copyOf((List<Order>) orderRepository.findAll());
+	public List<OrderOutputDTO> readOrders() {
+		List<Order> orderList = (List<Order>) orderRepository.findAll();
+		List<OrderOutputDTO> orderDtoList = new LinkedList<>();
+		for(Order o : orderList)
+			orderDtoList.add(new OrderOutputDTO(o.getId(), o.getCustomerId(), o.getSize(), o.getStatus(), o.getAssignedCenter(), o.getCoordinates()));
+		return orderDtoList;
 	}
 	
 	@Override
@@ -112,8 +124,9 @@ public class OrderServiceImpl implements OrderService {
 								.toList();
 	}
 
+	@Transactional(readOnly = true)
 	private List<Order> getPendingOrders() {
-		return readOrders().stream()
+		return orderRepository.findAll().stream()
 							.filter(o -> o.getStatus().equals(STATUS_PENDING))
 							.sorted(Comparator.comparingLong(o -> o.getId()))
 							.toList();
