@@ -19,15 +19,11 @@ WORKDIR /app
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
-# Copy the application jar
 COPY --from=build /app/target/inditex-*.jar /app/inditex.jar
 
-# Metadata for the image
 LABEL version="1.0"
 LABEL description="Docker image for Inditex project"
 
-# Expose the application port
 EXPOSE 3000
 
-# Optimize JVM for production
 ENTRYPOINT ["java", "-jar", "/app/inditex.jar"]

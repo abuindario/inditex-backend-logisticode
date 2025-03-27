@@ -25,12 +25,12 @@ public class CenterServiceController {
 	CenterService centerService;
 	
 	@PostMapping("/api/centers")
-	public ResponseEntity<CenterApiResponse> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
+	public ResponseEntity<ApiResponse> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
 		try {
 			centerService.validateAndSaveLogisticsCenter(centerDto);
-			return ResponseEntity.status(HttpStatus.CREATED).body(new CenterApiResponse("Logistics center created successfully."));
+			return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Logistics center created successfully."));
 		} catch(IllegalArgumentException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CenterApiResponse(e.getMessage()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage()));
 		}
 	}
 	
@@ -40,23 +40,23 @@ public class CenterServiceController {
 	}
 	
 	@DeleteMapping("/api/centers/{id}")
-	public ResponseEntity<CenterApiResponse> deleteLogisticsCenterById(@PathVariable("id") int id) {
+	public ResponseEntity<ApiResponse> deleteLogisticsCenterById(@PathVariable("id") int id) {
 		centerService.deleteLogisticsCenterById(id);
-		return ResponseEntity.ok(new CenterApiResponse("Logistics center deleted successfully."));
+		return ResponseEntity.ok(new ApiResponse("Logistics center deleted successfully."));
 	}
 	
 	@PatchMapping("/api/centers/{id}")
-	public ResponseEntity<CenterApiResponse> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
+	public ResponseEntity<ApiResponse> updateLogisticsCenter(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
 		try {
 			Center center = centerService.findCenterById(id).orElseThrow(() -> new NoSuchElementException("Center not found."));
 			centerService.updateAndSaveCenter(center, updates);
-			return ResponseEntity.ok(new CenterApiResponse("Logistics center updated successfully."));
+			return ResponseEntity.ok(new ApiResponse("Logistics center updated successfully."));
 		} catch(NoSuchElementException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CenterApiResponse(e.getMessage()));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage()));
 		} catch(IllegalArgumentException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CenterApiResponse(e.getMessage()));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage()));
 		}
 	}
 }
 
-record CenterApiResponse(String message) {}
+record ApiResponse(String message) {}
