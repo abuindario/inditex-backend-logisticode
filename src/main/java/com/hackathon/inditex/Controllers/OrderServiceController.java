@@ -2,7 +2,6 @@ package com.hackathon.inditex.Controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +17,11 @@ import com.hackathon.inditex.Services.OrderService;
 
 @RestController
 public class OrderServiceController {
-	@Autowired
-	OrderService orderService;
+	private final OrderService orderService;
+	
+	public OrderServiceController(OrderService orderService) {
+		this.orderService = orderService;
+	}
 
 	@PostMapping("/api/orders")
 	public ResponseEntity<OrderApiResponse> createOrder(@RequestBody OrderDTO orderDto) {

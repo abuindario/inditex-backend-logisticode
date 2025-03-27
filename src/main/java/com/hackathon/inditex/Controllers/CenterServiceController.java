@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,8 +20,11 @@ import com.hackathon.inditex.Services.CenterService;
 
 @RestController
 public class CenterServiceController {
-	@Autowired
-	CenterService centerService;
+	private final CenterService centerService;
+	
+	public CenterServiceController(CenterService centerService) {
+		this.centerService = centerService;
+	}
 	
 	@PostMapping("/api/centers")
 	public ResponseEntity<ApiResponse> createLogisticsCenter(@RequestBody CenterDTO centerDto) {		
